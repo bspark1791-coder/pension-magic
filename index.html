@@ -491,6 +491,18 @@ h1 span{color:var(--pension)}
 .msub-btn{padding:8px 20px;font-size:13px;font-weight:500;border:none;border-radius:7px;cursor:pointer;background:transparent;color:var(--text3);transition:all 0.2s;font-family:var(--sans)}
 .msub-btn:hover{color:var(--text)}
 .msub-btn.active{background:var(--bg);color:var(--text);font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.25)}
+/* ══ 채팅 ══ */
+.chat-msg{display:flex;gap:8px;align-items:flex-start}
+.chat-msg.mine{flex-direction:row-reverse}
+.chat-avatar{width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text2)}
+.chat-bubble{max-width:220px;padding:8px 12px;border-radius:12px;font-size:13px;line-height:1.5;color:var(--text);background:var(--bg3);border:1px solid var(--border)}
+.chat-msg.mine .chat-bubble{background:rgba(61,142,240,0.2);border-color:rgba(61,142,240,0.3)}
+.chat-meta{font-size:10px;color:var(--text3);margin-top:3px}
+.chat-msg.mine .chat-meta{text-align:right}
+.chat-date-divider{text-align:center;font-size:10px;color:var(--text3);padding:4px 0;position:relative}
+.chat-date-divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border)}
+.chat-date-divider span{background:var(--bg2);padding:0 8px;position:relative}
+@media(max-width:768px){#chat-panel{width:100%;height:70%;bottom:0;right:0;border-radius:18px 18px 0 0}}
 .msub-panel{display:none !important}
 .msub-panel.active{display:block !important}
 .port-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
@@ -1268,6 +1280,12 @@ footer{text-align:center;padding:28px 0 0;font-size:12px;color:var(--text3);bord
     <span class="nav-username" id="nav-username"></span>
     <button class="nav-logout-btn" id="nav-logout-btn" onclick="doLogout()" style="display:none">로그아웃</button>
   </div>
+  <!-- 채팅 버튼 -->
+  <button id="chat-toggle-btn" onclick="toggleChat()" title="실시간 채팅" style="width:36px;height:36px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;position:relative">
+    💬
+    <span id="chat-unread" style="display:none;position:absolute;top:-4px;right:-4px;width:16px;height:16px;background:var(--red);border-radius:50%;font-size:9px;font-weight:700;color:#fff;align-items:center;justify-content:center">0</span>
+  </button>
+
   <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMobileNav()" aria-label="메뉴">
     <span></span><span></span><span></span>
   </button>
@@ -3364,6 +3382,41 @@ Coca-Cola	=GOOGLEFINANCE("NYSE:KO","price")	=GOOGLEFINANCE("NYSE:KO","changepct"
 
 <!-- ══════════════ 수익률 비교 시뮬레이터 ══════════════ -->
 
+<!-- ══════════════ 실시간 채팅 ══════════════ -->
+<div id="chat-panel" style="display:none;position:fixed;bottom:20px;right:20px;width:340px;height:480px;background:var(--bg2);border:1px solid var(--border);border-radius:18px;box-shadow:0 8px 40px rgba(0,0,0,0.4);z-index:500;display:none;flex-direction:column;overflow:hidden">
+  <!-- 헤더 -->
+  <div style="padding:14px 16px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:16px">💬</span>
+      <span style="font-size:14px;font-weight:700;color:var(--text)">실시간 채팅</span>
+      <span id="chat-online" style="font-size:10px;padding:2px 8px;background:rgba(52,201,122,0.15);color:var(--irp);border-radius:10px;border:1px solid rgba(52,201,122,0.3)">● 온라인</span>
+    </div>
+    <button onclick="toggleChat()" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:2px 6px">✕</button>
+  </div>
+
+  <!-- 로그인 안내 (비로그인) -->
+  <div id="chat-login-notice" style="display:none;flex:1;align-items:center;justify-content:center;flex-direction:column;gap:12px;padding:24px;text-align:center">
+    <div style="font-size:36px">🔐</div>
+    <div style="font-size:14px;font-weight:600;color:var(--text)">채팅하려면 로그인하세요</div>
+    <div style="font-size:12px;color:var(--text3)">구글 계정으로 로그인하면<br>다른 투자자들과 대화할 수 있어요</div>
+    <a href="/api/auth/google" style="padding:10px 20px;background:var(--pension);color:#fff;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600">구글로 로그인</a>
+  </div>
+
+  <!-- 메시지 목록 -->
+  <div id="chat-messages" style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth"></div>
+
+  <!-- 입력창 -->
+  <div id="chat-input-area" style="padding:12px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0">
+    <input id="chat-input" type="text" placeholder="메시지 입력..." maxlength="200"
+      style="flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;font-family:var(--sans)"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}">
+    <button onclick="sendChatMessage()" style="padding:8px 14px;background:var(--pension);border:none;border-radius:10px;color:#fff;font-size:13px;cursor:pointer;font-family:var(--sans);font-weight:600">전송</button>
+  </div>
+</div>
+
+<!-- 모바일 채팅 오버레이 -->
+<div id="chat-overlay" onclick="toggleChat()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:499"></div>
+
 <script>
 
 /* ── Auth 함수 (최상단 정의) ── */
@@ -3634,6 +3687,134 @@ async function saveCloudPortfolio() {
   } catch(e) {
     console.warn('포트폴리오 저장 실패:', e.message);
   }
+}
+
+/* ══ 실시간 채팅 (Supabase) ══ */
+const SUPABASE_URL      = 'https://ijkloagczgibmjsfmkcj.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_VuoRz9GdajtvjuB6sQTV9Q_bdjUobLt1V28sxnb7T4g';
+
+let chatOpen      = false;
+let chatUnreadCnt = 0;
+let chatInited    = false;
+let chatLastId    = 0;
+let chatPollTimer = null;
+
+function toggleChat() {
+  const panel   = document.getElementById('chat-panel');
+  const overlay = document.getElementById('chat-overlay');
+  chatOpen = !chatOpen;
+  if (chatOpen) {
+    panel.style.display   = 'flex';
+    overlay.style.display = 'block';
+    chatUnreadCnt = 0;
+    updateChatUnread(0);
+    if (!chatInited) initChat();
+    setTimeout(scrollChatBottom, 100);
+  } else {
+    panel.style.display   = 'none';
+    overlay.style.display = 'none';
+  }
+}
+
+async function initChat() {
+  chatInited = true;
+  const session     = sessionStorage.getItem('pm_session');
+  const loginNotice = document.getElementById('chat-login-notice');
+  const inputArea   = document.getElementById('chat-input-area');
+  const messagesEl  = document.getElementById('chat-messages');
+  if (!session) {
+    if (loginNotice) loginNotice.style.display = 'flex';
+    if (inputArea)   inputArea.style.display   = 'none';
+    if (messagesEl)  messagesEl.style.display  = 'none';
+    return;
+  }
+  await loadRecentMessages();
+  startChatPoll();
+}
+
+async function loadRecentMessages() {
+  try {
+    const res  = await fetch(SUPABASE_URL + '/rest/v1/messages?select=*&order=created_at.asc&limit=50', {
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+    });
+    const msgs = await res.json();
+    if (Array.isArray(msgs)) {
+      const el = document.getElementById('chat-messages');
+      if (el) el.innerHTML = '';
+      msgs.forEach(m => { appendChatMessage(m, false); chatLastId = Math.max(chatLastId, m.id); });
+      scrollChatBottom();
+    }
+  } catch(e) { console.warn('채팅 로드 실패:', e); }
+}
+
+function startChatPoll() {
+  if (chatPollTimer) clearInterval(chatPollTimer);
+  chatPollTimer = setInterval(async () => {
+    try {
+      const res  = await fetch(SUPABASE_URL + '/rest/v1/messages?select=*&order=created_at.asc&id=gt.' + chatLastId, {
+        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+      });
+      const msgs = await res.json();
+      if (Array.isArray(msgs) && msgs.length > 0) {
+        msgs.forEach(m => { appendChatMessage(m, true); chatLastId = Math.max(chatLastId, m.id); });
+        if (!chatOpen) updateChatUnread(chatUnreadCnt + msgs.length);
+        if (chatOpen)  scrollChatBottom();
+      }
+    } catch(e) {}
+  }, 2000);
+}
+
+async function sendChatMessage() {
+  const input   = document.getElementById('chat-input');
+  const content = input?.value.trim();
+  if (!content) return;
+  const session = sessionStorage.getItem('pm_session');
+  if (!session) return;
+  const user = JSON.parse(session);
+  input.value = '';
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/messages', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json', 'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify({ user_name: user.name||'익명', user_email: user.email||'', user_picture: user.picture||'', content }),
+    });
+  } catch(e) { console.warn('전송 실패:', e); }
+}
+
+function appendChatMessage(msg, animate) {
+  const el = document.getElementById('chat-messages');
+  if (!el) return;
+  const session  = sessionStorage.getItem('pm_session');
+  const myEmail  = session ? JSON.parse(session).email : '';
+  const isMe     = msg.user_email === myEmail;
+  const time     = new Date(msg.created_at).toLocaleTimeString('ko-KR', {hour:'2-digit',minute:'2-digit'});
+  const initials = (msg.user_name||'?')[0].toUpperCase();
+  const div      = document.createElement('div');
+  div.className  = 'chat-msg' + (isMe ? ' mine' : '');
+  const avatar   = msg.user_picture
+    ? '<img src="' + msg.user_picture + '" class="chat-avatar" onerror="this.src=\'\'">'
+    : '<div class="chat-avatar">' + initials + '</div>';
+  div.innerHTML  = avatar + '<div>'
+    + (isMe ? '' : '<div style="font-size:10px;color:var(--text3);margin-bottom:2px">' + msg.user_name + '</div>')
+    + '<div class="chat-bubble">' + msg.content.replace(/</g,'&lt;') + '</div>'
+    + '<div class="chat-meta">' + time + '</div></div>';
+  el.appendChild(div);
+}
+
+function scrollChatBottom() {
+  const el = document.getElementById('chat-messages');
+  if (el) el.scrollTop = el.scrollHeight;
+}
+
+function updateChatUnread(cnt) {
+  chatUnreadCnt = cnt;
+  const badge = document.getElementById('chat-unread');
+  if (!badge) return;
+  badge.style.display = cnt > 0 ? 'flex' : 'none';
+  badge.textContent   = cnt > 9 ? '9+' : cnt;
 }
 
 /* ══ 뉴스 1분 자동 갱신 ══ */
