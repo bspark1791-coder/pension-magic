@@ -2444,6 +2444,11 @@ footer{text-align:center;padding:28px 0 0;font-size:12px;color:var(--text3);bord
     <p class="header-sub">월별 배당금 수령 일정 — 국내·미국 주요 배당주 한눈에</p>
   </header>
 
+  <!-- 실시간 시세 상태 바 -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg3);border-radius:10px;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <span id="div-sheet-status" style="font-size:12px;color:var(--text3)">🔄 시세 연동 중...</span>
+    <button onclick="loadDivSheetData()" style="padding:5px 14px;background:rgba(52,201,122,0.15);border:1px solid rgba(52,201,122,0.3);border-radius:6px;color:var(--irp);font-size:12px;cursor:pointer;font-family:var(--sans)">🔄 시세 새로고침</button>
+  </div>
   <!-- 국내/미국 탭 -->
   <div class="div-country-tabs" style="margin-bottom:16px">
     <button class="div-ctab active" data-country="kr" onclick="setDivCountry('kr')">🇰🇷 국내 배당주</button>
@@ -3326,8 +3331,10 @@ function doLogout() {
 }
 /* ── 실시간 주가 전역 변수 (최상단 선언 필수) ── */
 let stocksData = [];
-const SHEET_URL_KEY = 'pm_sheet_url';
-const DEFAULT_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTZPtcpzxNG-1H3Ollk62aVRuLpcIKH-XgWFkEFUusTgtub8GDVwMW0eLm2EAJCXN1WD5dHHBhtD_Yy/pub?gid=0&single=true&output=csv';
+const SHEET_URL_KEY     = 'pm_sheet_url';
+const DEFAULT_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT7kP3yNvc8JQfkgL_jCbyJC0rTWPRAo1qLHA1jcP9ighLgOCZAqvW_eDYBYcKFEwCAmtL7IETE5b0p/pub?gid=0&single=true&output=csv';       // 시트1 — 실시간 주가
+const ETF_SHEET_URL     = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT7kP3yNvc8JQfkgL_jCbyJC0rTWPRAo1qLHA1jcP9ighLgOCZAqvW_eDYBYcKFEwCAmtL7IETE5b0p/pub?gid=1609992099&single=true&output=csv';  // 시트2 — ETF 리스트
+const DIV_SHEET_URL     = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT7kP3yNvc8JQfkgL_jCbyJC0rTWPRAo1qLHA1jcP9ighLgOCZAqvW_eDYBYcKFEwCAmtL7IETE5b0p/pub?gid=1418202891&single=true&output=csv';  // 시트3 — 배당주
 
 /* ═══════════════════════════════════════
    연금의 마술사 — 연봉·국민연금 통계
@@ -3555,7 +3562,7 @@ function showPage(name) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === name));
   if (name === 'portfolio') renderPortfolioCharts();
   if (name === 'etflist')   setTimeout(() => fetchAllPrices(), 300);
-  if (name === 'market')    { renderDivCalendar(); }
+  if (name === 'market')    { renderDivCalendar(); setTimeout(loadDivSheetData, 500); }
   if (name === 'insight')   { renderSalaryGrid(); renderJjajangChart(); }
   if (name === 'planner')   { /* 계산기는 이미 초기화됨 */ }
   if (name === 'goalcalc')  { calcGoal(); }
@@ -3585,7 +3592,7 @@ function showSubTab(page, sub) {
   if (page === 'planner' && sub === 'compare')     { calcCompare(); }
   if (page === 'insight' && sub === 'about')    { renderSalaryGrid(); setTimeout(renderJjajangChart, 100); }
   if (page === 'insight' && sub === 'news')     renderNews();
-  if (page === 'market'  && sub === 'dividend') renderDivCalendar();
+  if (page === 'market'  && sub === 'dividend') { renderDivCalendar(); setTimeout(loadDivSheetData, 300); }
   if (page === 'market'  && sub === 'etfdiv')   renderEtfDivCalendar();
   if (page === 'market'  && sub === 'stocks')   initStocksPage();
 }
@@ -5626,6 +5633,140 @@ function renderJjajangChart() {
    실시간 주가 — 구글 시트 연동
 ═══════════════════════════════════════ */
 
+
+/* ── 공통 CSV fetch 함수 (프록시 순차 시도) ── */
+async function fetchCSV(sheetUrl) {
+  async function tryProxy(url) {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return await res.text();
+  }
+  const proxies = [
+    'https://api.allorigins.win/get?url=' + encodeURIComponent(sheetUrl),
+    'https://corsproxy.io/?' + encodeURIComponent(sheetUrl),
+    'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(sheetUrl),
+  ];
+  for (const p of proxies) {
+    try {
+      const text = await tryProxy(p);
+      if (!text || text.length < 5) continue;
+      if (text.trim().startsWith('{')) {
+        try {
+          const j = JSON.parse(text);
+          const raw = j.contents || j.data || '';
+          if (raw && raw.length > 5) return raw;
+        } catch(e) { continue; }
+      } else { return text; }
+    } catch(e) { continue; }
+  }
+  return null;
+}
+
+/* ── CSV 파싱 ── */
+function parseCSV(csv) {
+  return csv.replace(/\r/g,'').split('\n').map(line => {
+    const cols = []; let cur = '', inQ = false;
+    for (const ch of line) {
+      if (ch === '"') { inQ = !inQ; continue; }
+      if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; continue; }
+      cur += ch;
+    }
+    cols.push(cur.trim());
+    return cols;
+  });
+}
+
+/* ── 시트2: ETF 리스트 실시간 시세 로드 ── */
+async function loadETFSheetData() {
+  const statusEl = document.getElementById('etf-sheet-status');
+  if (statusEl) statusEl.textContent = '🔄 시세 불러오는 중...';
+
+  const csv = await fetchCSV(ETF_SHEET_URL);
+  if (!csv) {
+    if (statusEl) statusEl.textContent = '❌ 연결 실패';
+    return;
+  }
+  const rows = parseCSV(csv);
+  const data = rows.slice(1).filter(r => r[0] && r[0] !== '종목명');
+
+  // ETF 리스트 테이블에 시세 반영
+  data.forEach(r => {
+    const name  = r[0] || '';
+    const code  = r[1] || '';
+    const price = parseFloat(r[2]) || 0;
+    const chg   = parseFloat(r[3]) || 0;
+
+    // 코드로 행 찾기
+    const rows = document.querySelectorAll('#etf-table-body tr');
+    rows.forEach(tr => {
+      const codeCell = tr.querySelector('.etf-code');
+      if (codeCell && codeCell.textContent.trim() === code) {
+        const priceCell = tr.querySelector('.etf-price');
+        const chgCell   = tr.querySelector('.etf-chg');
+        if (priceCell) priceCell.textContent = Math.round(price).toLocaleString('ko-KR') + '원';
+        if (chgCell) {
+          chgCell.textContent = (chg >= 0 ? '▲ +' : '▼ ') + chg.toFixed(2) + '%';
+          chgCell.className = 'etf-chg ' + (chg > 0 ? 'pos' : chg < 0 ? 'neg' : 'flat');
+        }
+      }
+    });
+  });
+
+  const now = new Date().toLocaleTimeString('ko-KR');
+  if (statusEl) statusEl.textContent = '✅ ' + now + ' 업데이트';
+}
+
+/* ── 시트3: 배당주 실시간 시세 로드 ── */
+let divSheetData = [];
+
+async function loadDivSheetData() {
+  const statusEl = document.getElementById('div-sheet-status');
+  if (statusEl) statusEl.textContent = '🔄 시세 불러오는 중...';
+
+  const csv = await fetchCSV(DIV_SHEET_URL);
+  if (!csv) {
+    if (statusEl) statusEl.textContent = '❌ 연결 실패';
+    return;
+  }
+  const rows = parseCSV(csv);
+  divSheetData = rows.slice(1).filter(r => r[0] && r[0] !== '종목명');
+
+  // 배당주 카드에 실시간 시세 반영
+  updateDivCardPrices();
+
+  const now = new Date().toLocaleTimeString('ko-KR');
+  if (statusEl) statusEl.textContent = '✅ ' + now + ' 업데이트';
+}
+
+function updateDivCardPrices() {
+  if (!divSheetData.length) return;
+  divSheetData.forEach(r => {
+    const name  = (r[0] || '').trim();
+    const price = parseFloat(r[2]) || 0;
+    const chg   = parseFloat(r[3]) || 0;
+
+    // 종목명으로 카드 찾아서 시세 업데이트
+    document.querySelectorAll('.div-card').forEach(card => {
+      const nameEl = card.querySelector('.div-name');
+      if (nameEl && nameEl.textContent.trim() === name) {
+        // 현재가 표시 요소 찾거나 생성
+        let priceEl = card.querySelector('.div-live-price');
+        if (!priceEl) {
+          priceEl = document.createElement('div');
+          priceEl.className = 'div-live-price';
+          priceEl.style.cssText = 'font-family:var(--mono);font-size:13px;font-weight:600;margin-top:6px;padding-top:6px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center';
+          card.appendChild(priceEl);
+        }
+        const isKR = price >= 100;
+        const pStr = isKR ? Math.round(price).toLocaleString('ko-KR') + '원' : '$' + price.toFixed(2);
+        const cStr = (chg >= 0 ? '▲ +' : '▼ ') + chg.toFixed(2) + '%';
+        const cCol = chg > 0 ? 'var(--irp)' : chg < 0 ? 'var(--red)' : 'var(--text3)';
+        priceEl.innerHTML = '<span style="color:var(--text2);font-size:11px">현재가</span>'
+          + '<span>' + pStr + ' <span style="color:' + cCol + ';font-size:11px">' + cStr + '</span></span>';
+      }
+    });
+  });
+}
 
 function initStocksPage() {
   // URL 인풋에 기본값 채우기 (설정 패널이 닫혀있어도 OK)
