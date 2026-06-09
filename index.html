@@ -3563,16 +3563,11 @@ function restoreTheme() {
     document.querySelectorAll('.theme-toggle').forEach(btn => btn.textContent = '☀️');
   }
 }
-// 저장된 테마 복원 + 인증 버튼 이벤트 연결 (DOM 로드 후 안전하게)
-// DOM이 이미 로드됐을 수 있으므로 readyState 체크
-function initApp() {
-  // 테마 복원
+// 모든 JS 파싱 완료 후 실행 보장
+window.addEventListener('load', function() {
   restoreTheme();
-
-  // 인증 초기화
   initAuth();
 
-  // ── 버튼 이벤트 연결 ──
   function on(id, ev, fn) {
     var el = document.getElementById(id);
     if (el) el.addEventListener(ev, fn);
@@ -3589,13 +3584,7 @@ function initApp() {
   on('signup-email', 'keydown', function(e) { if(e.key==='Enter') doSignup(); });
   on('signup-pw',    'keydown', function(e) { if(e.key==='Enter') doSignup(); });
   on('signup-pw2',   'keydown', function(e) { if(e.key==='Enter') doSignup(); });
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initApp);
-} else {
-  initApp(); // 이미 로드됨
-}
+});
 
 /* ══ 모바일 네비 ══ */
 function toggleMobileNav() {
