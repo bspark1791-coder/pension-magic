@@ -3522,12 +3522,15 @@ function doLogout() {
 ════════════════════════════════════════ */
 // initAuth는 아래 DOMContentLoaded에서 호출
 function initAuth() {
+  // 구글 콜백 파라미터가 있으면 handleGoogleCallback이 처리하므로 스킵
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('auth') === 'success') return;
+
   // sessionStorage 먼저, 없으면 localStorage (PWA 지원)
   const session = sessionStorage.getItem('pm_session') || localStorage.getItem('pm_session');
   if (session) {
     try {
       const user = JSON.parse(session);
-      // 둘 다 동기화
       sessionStorage.setItem('pm_session', session);
       showNavUser(user.name || user.email);
       return;
@@ -3652,11 +3655,15 @@ function closeMobileNav() {
     const picture = params.get('picture') || '';
     const token   = params.get('access_token') || '';
 
-    // localStorage에 영구 저장 (PWA 재실행 시에도 유지)
+    // localStorage에 영구 저장
     const user = { name, email, picture, token, provider: 'google' };
     localStorage.setItem('pm_session', JSON.stringify(user));
     sessionStorage.setItem('pm_session', JSON.stringify(user));
     localStorage.setItem('pm_user', JSON.stringify({ name, email, picture }));
+
+    // 오버레이 확실히 숨기기
+    const overlay = document.getElementById('auth-overlay');
+    if (overlay) overlay.classList.add('hidden');
 
     // 로그인 처리
     showNavUser(name);
