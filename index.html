@@ -1201,6 +1201,11 @@ footer{text-align:center;padding:28px 0 0;font-size:12px;color:var(--text3);bord
       </div>
       <button class="auth-btn" type="button" id="btn-login">🔓 로그인</button>
       <div class="auth-divider">또는</div>
+      <a href="/api/auth/google" class="auth-btn google-btn" style="display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#3c4043;border:1px solid #dadce0;box-shadow:0 1px 3px rgba(0,0,0,0.1);text-decoration:none">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Google 계정으로 로그인
+      </a>
+      <div class="auth-divider">또는</div>
       <button class="auth-btn" type="button" id="btn-guest" style="background:linear-gradient(135deg,rgba(240,168,50,0.5),rgba(240,168,50,0.3));box-shadow:none">👀 둘러보기 (비회원)</button>
     </div>
 
@@ -3553,7 +3558,99 @@ function closeMobileNav() {
   document.getElementById('nav-hamburger')?.classList.remove('open');
 }
 
-/* ══ showNavUser — 데스크탑+모바일 동시 반영 ══ */
+/* ══ 구글 로그인 콜백 처리 ══ */
+(function handleGoogleCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const auth   = params.get('auth');
+  if (!auth) return;
+
+  // URL 파라미터 즉시 제거 (보안)
+  window.history.replaceState({}, '', '/');
+
+  if (auth === 'error') {
+    const msg = params.get('msg') || '로그인 실패';
+    setTimeout(() => showAuthError('구글 로그인 오류: ' + msg), 500);
+    return;
+  }
+
+  if (auth === 'success') {
+    const name    = params.get('name')  || '사용자';
+    const email   = params.get('email') || '';
+    const picture = params.get('picture') || '';
+    const token   = params.get('access_token') || '';
+
+    // 세션 저장
+    const user = { name, email, picture, token, provider: 'google' };
+    sessionStorage.setItem('pm_session', JSON.stringify(user));
+    localStorage.setItem('pm_user', JSON.stringify({ name, email, picture }));
+
+    // 로그인 처리
+    showNavUser(name);
+
+    // 포트폴리오 자동 불러오기
+    if (email && token) loadCloudPortfolio(email, token);
+  }
+})();
+
+/* ══ 클라우드 포트폴리오 저장/불러오기 ══ */
+async function loadCloudPortfolio(email, token) {
+  try {
+    const res  = await fetch('/api/data?email=' + encodeURIComponent(email), {
+      headers: { Authorization: 'Bearer ' + token },
+    });
+    const json = await res.json();
+    if (json.ok && json.data && json.data.holdings) {
+      holdings = json.data.holdings;
+      renderHoldings();
+      console.log('✅ 포트폴리오 불러오기 완료:', holdings.length + '종목');
+    }
+  } catch(e) {
+    console.warn('포트폴리오 불러오기 실패:', e.message);
+  }
+}
+
+async function saveCloudPortfolio() {
+  const session = sessionStorage.getItem('pm_session');
+  if (!session) return;
+  try {
+    const user = JSON.parse(session);
+    if (user.provider !== 'google' || !user.token) return;
+    await fetch('/api/data', {
+      method:  'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': 'Bearer ' + user.token,
+      },
+      body: JSON.stringify({
+        email:     user.email,
+        name:      user.name,
+        portfolio: { holdings, savedAt: new Date().toISOString() },
+      }),
+    });
+    console.log('✅ 포트폴리오 저장 완료');
+  } catch(e) {
+    console.warn('포트폴리오 저장 실패:', e.message);
+  }
+}
+
+/* ══ 뉴스 1분 자동 갱신 ══ */
+let newsAutoRefreshTimer = null;
+
+function startNewsAutoRefresh() {
+  stopNewsAutoRefresh();
+  newsAutoRefreshTimer = setInterval(() => {
+    loadNews();
+  }, 60 * 1000); // 1분
+}
+
+function stopNewsAutoRefresh() {
+  if (newsAutoRefreshTimer) {
+    clearInterval(newsAutoRefreshTimer);
+    newsAutoRefreshTimer = null;
+  }
+}
+
+/* ══ showNavUser — 구글 프로필 사진도 표시 ══ */
 
 
 /* ── 회원가입 ── */
@@ -3829,8 +3926,8 @@ function showSubTab(page, sub) {
   if (page === 'planner' && sub === 'taxcal')     { initTaxCalMonth(); calcTaxCal(); }
   if (page === 'planner' && sub === 'calculator')  { calcPension(); }
   if (page === 'planner' && sub === 'compare')     { calcCompare(); }
-  if (page === 'insight' && sub === 'about')    { renderSalaryGrid(); setTimeout(renderJjajangChart, 100); }
-  if (page === 'insight' && sub === 'news')     renderNews();
+  if (page === 'insight' && sub === 'about')    { renderSalaryGrid(); setTimeout(renderJjajangChart, 100); stopNewsAutoRefresh(); }
+  if (page === 'insight' && sub === 'news')     { loadNews(); startNewsAutoRefresh(); }
   if (page === 'market'  && sub === 'dividend') { renderDivCalendar(); setTimeout(loadDivSheetData, 300); }
   if (page === 'market'  && sub === 'etfdiv')   renderEtfDivCalendar();
   if (page === 'market'  && sub === 'stocks')   initStocksPage();
@@ -5680,6 +5777,61 @@ function loadNews() {
   if (st) st.textContent = '마지막 업데이트: ' + new Date().toLocaleString('ko-KR');
   const btn = document.getElementById('news-refresh-btn');
   if (btn) btn.textContent = '🔄 새로고침';
+}
+
+/* ── RSS 뉴스 자동 로드 ── */
+let rssNewsCache = [];
+
+async function loadNews() {
+  const status = document.getElementById('news-status');
+  const btn    = document.getElementById('news-refresh-btn');
+
+  if (status) status.textContent = '🔄 뉴스 불러오는 중...';
+  if (btn)    btn.disabled = true;
+
+  try {
+    const res  = await fetch('/api/news');
+    if (!res.ok) throw new Error('API 응답 오류: ' + res.status);
+    const data = await res.json();
+
+    if (data.ok && data.news && data.news.length > 0) {
+      // RSS 뉴스 → newsItems 형식으로 변환
+      rssNewsCache = data.news.map((n, i) => ({
+        id:      'rss_' + i,
+        title:   n.title,
+        link:    n.link,
+        summary: n.summary,
+        cat:     rssCategory(n.category),
+        imp:     'mid',
+        time:    n.date,
+        source:  'RSS',
+      }));
+
+      // 기존 사용자 추가 뉴스 + RSS 뉴스 합치기
+      const stored    = localStorage.getItem('pension_user_news');
+      const userAdded = stored ? JSON.parse(stored) : [];
+      newsItems = [...userAdded, ...rssNewsCache];
+
+      if (status) status.textContent = '✅ ' + data.updated + ' 기준 · 총 ' + data.count + '건';
+    } else {
+      if (status) status.textContent = '⚠ RSS 수집 실패 — 기본 뉴스 표시 중';
+      newsItems = getAllNews();
+    }
+  } catch(e) {
+    if (status) status.textContent = '❌ 연결 실패 (' + e.message + ') — 기본 뉴스 표시';
+    newsItems = getAllNews();
+  }
+
+  if (btn) btn.disabled = false;
+  renderNews();
+}
+
+function rssCategory(cat) {
+  if (!cat) return 'market';
+  if (cat.includes('글로벌') || cat.includes('🌏')) return 'global';
+  if (cat.includes('연금') || cat.includes('세금') || cat.includes('🏦')) return 'pension';
+  if (cat.includes('ETF') || cat.includes('💹')) return 'etf';
+  return 'market';
 }
 
 function renderNews() {
