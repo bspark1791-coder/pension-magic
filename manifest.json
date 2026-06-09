@@ -1,0 +1,51 @@
+{
+  "name": "연금의 마술사",
+  "short_name": "연금마술사",
+  "description": "스마트한 노후 준비 — 개인연금·IRP·ISA 계산기",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d0f14",
+  "theme_color": "#f0a832",
+  "orientation": "portrait-primary",
+  "lang": "ko",
+  "categories": ["finance", "productivity"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "플래너",
+      "url": "/?page=planner",
+      "description": "연금 계산기"
+    },
+    {
+      "name": "포트폴리오",
+      "url": "/?page=portfolio",
+      "description": "내 포트폴리오"
+    },
+    {
+      "name": "노후설계",
+      "url": "/?page=goalcalc",
+      "description": "노후 목표 설계"
+    }
+  ]
+}
