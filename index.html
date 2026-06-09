@@ -3543,10 +3543,13 @@ function doLogout() {
 ════════════════════════════════════════ */
 // initAuth는 아래 DOMContentLoaded에서 호출
 function initAuth() {
-  const session = sessionStorage.getItem('pm_session');
+  // sessionStorage 먼저, 없으면 localStorage (PWA 지원)
+  const session = sessionStorage.getItem('pm_session') || localStorage.getItem('pm_session');
   if (session) {
     try {
       const user = JSON.parse(session);
+      // 둘 다 동기화
+      sessionStorage.setItem('pm_session', session);
       showNavUser(user.name || user.email);
       return;
     } catch(e) {}
@@ -3668,6 +3671,21 @@ function closeMobileNav() {
 (function handleGoogleCallback() {
   const params = new URLSearchParams(window.location.search);
   const auth   = params.get('auth');
+
+  // ── 자동 로그인 복원 (PWA 재실행 시) ──
+  const saved = localStorage.getItem('pm_session');
+  if (saved && !auth) {
+    try {
+      const user = JSON.parse(saved);
+      if (user.name) {
+        // 세션도 같이 저장 (하위 호환)
+        sessionStorage.setItem('pm_session', saved);
+        showNavUser(user.name);
+        if (user.email && user.token) loadCloudPortfolio(user.email, user.token);
+      }
+    } catch(e) {}
+  }
+
   if (!auth) return;
 
   // URL 파라미터 즉시 제거 (보안)
@@ -3680,13 +3698,14 @@ function closeMobileNav() {
   }
 
   if (auth === 'success') {
-    const name    = params.get('name')  || '사용자';
-    const email   = params.get('email') || '';
+    const name    = params.get('name')    || '사용자';
+    const email   = params.get('email')   || '';
     const picture = params.get('picture') || '';
     const token   = params.get('access_token') || '';
 
-    // 세션 저장
+    // localStorage에 영구 저장 (PWA 재실행 시에도 유지)
     const user = { name, email, picture, token, provider: 'google' };
+    localStorage.setItem('pm_session', JSON.stringify(user));
     sessionStorage.setItem('pm_session', JSON.stringify(user));
     localStorage.setItem('pm_user', JSON.stringify({ name, email, picture }));
 
