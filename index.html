@@ -1120,11 +1120,11 @@ footer{text-align:center;padding:28px 0 0;font-size:12px;color:var(--text3);bord
 </div>
 
 <!-- ══════════════ 실시간 주가 티커 바 ══════════════ -->
-<div id="ticker-bar" style="display:none">
+<div id="ticker-bar" style="display:block">
   <div class="ticker-wrap">
     <span class="ticker-label">📡 실시간</span>
     <div class="ticker-track" id="ticker-track">
-      <span class="ticker-loading">구글 시트 연결 대기 중...</span>
+      <span class="ticker-loading">📡 시세 연결 중...</span>
     </div>
     <button class="ticker-refresh" onclick="loadGoogleSheetData()" title="새로고침">🔄</button>
     <button class="ticker-setting" onclick="showPage('stocks')" title="주가 설정">⚙</button>
@@ -2434,7 +2434,9 @@ footer{text-align:center;padding:28px 0 0;font-size:12px;color:var(--text3);bord
   <div class="merged-subtabs">
     <button class="msub-btn active" data-sub="dividend" onclick="showSubTab('market','dividend')">📅 배당달력</button>
     <button class="msub-btn" data-sub="etfdiv" onclick="showSubTab('market','etfdiv')" style="color:var(--isa)">📦 ETF 배당</button>
+    <!-- 실시간주가 탭 숨김 (활성화 필요 시 요청)
     <button class="msub-btn" data-sub="stocks" onclick="showSubTab('market','stocks')" style="color:var(--irp)">📡 실시간주가</button>
+    -->
   </div>
   <div id="market-dividend" class="msub-panel active" style="display:block">
 <div class="page">
@@ -5636,19 +5638,29 @@ function renderJjajangChart() {
 
 /* ── 공통 CSV fetch 함수 (프록시 순차 시도) ── */
 async function fetchCSV(sheetUrl) {
-  async function tryProxy(url) {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    return await res.text();
-  }
+  // ① Vercel API 프록시 (서버사이드 — CORS 완전 우회)
+  try {
+    const apiUrl = '/api/sheet?url=' + encodeURIComponent(sheetUrl);
+    const res = await fetch(apiUrl);
+    if (res.ok) {
+      const text = await res.text();
+      if (text && text.length > 5 && !text.trim().startsWith('<') && !text.trim().startsWith('{')) {
+        return text;
+      }
+    }
+  } catch(e) {}
+
+  // ② 외부 프록시 폴백 (로컬 개발 환경용)
   const proxies = [
-    'https://api.allorigins.win/get?url=' + encodeURIComponent(sheetUrl),
     'https://corsproxy.io/?' + encodeURIComponent(sheetUrl),
+    'https://api.allorigins.win/get?url=' + encodeURIComponent(sheetUrl),
     'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(sheetUrl),
   ];
   for (const p of proxies) {
     try {
-      const text = await tryProxy(p);
+      const res = await fetch(p);
+      if (!res.ok) continue;
+      const text = await res.text();
       if (!text || text.length < 5) continue;
       if (text.trim().startsWith('{')) {
         try {
@@ -5656,7 +5668,7 @@ async function fetchCSV(sheetUrl) {
           const raw = j.contents || j.data || '';
           if (raw && raw.length > 5) return raw;
         } catch(e) { continue; }
-      } else { return text; }
+      } else if (!text.trim().startsWith('<')) { return text; }
     } catch(e) { continue; }
   }
   return null;
@@ -5788,45 +5800,17 @@ function saveAndLoadSheet() {
 }
 
 async function loadGoogleSheetData() {
-  showSheetStatus('🔄 불러오는 중...', 'var(--text3)');
+  showSheetStatus('🔄 연결 중...', 'var(--text3)');
 
   const CSV_URL = DEFAULT_SHEET_URL;
-
-  // signal 없이 순수 fetch (AbortSignal 사용 안 함)
-  async function tryProxy(url) {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    return await res.text();
-  }
-
   let csv = null;
 
-  // 프록시 순차 시도
-  const proxyList = [
-    'https://api.allorigins.win/get?url=' + encodeURIComponent(CSV_URL),
-    'https://corsproxy.io/?' + encodeURIComponent(CSV_URL),
-    'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(CSV_URL),
-  ];
-
-  for (const proxyUrl of proxyList) {
-    try {
-      const text = await tryProxy(proxyUrl);
-      if (!text || text.length < 5) continue;
-      // allorigins wrapper 해제
-      if (text.trim().startsWith('{')) {
-        try {
-          const j = JSON.parse(text);
-          const raw = j.contents || j.data || '';
-          if (raw && raw.length > 5) { csv = raw; break; }
-        } catch(e) { continue; }
-      } else {
-        csv = text; break;
-      }
-    } catch(e) { continue; }
-  }
+  // fetchCSV 공통 함수 사용 (Vercel API → 외부 프록시 폴백)
+  csv = await fetchCSV(CSV_URL);
 
   if (!csv || csv.trim().length < 5) {
-    showSheetStatus('❌ 연결 실패 — 새로고침을 눌러주세요', 'var(--red)');
+    showSheetStatus('❌ 연결 실패 — 10초 후 재시도 중...', 'var(--red)');
+    setTimeout(loadGoogleSheetData, 10000);  // 10초 후 자동 재시도
     return;
   }
 
@@ -6991,6 +6975,17 @@ renderSalaryGrid();
 renderJjajangChart();
 renderDivGrid();
 renderNews();
+
+/* ── 앱 시작 시 구글 시트 자동 연동 ── */
+(function autoLoadSheets() {
+  // 즉시 시작 (500ms 후)
+  setTimeout(loadGoogleSheetData, 500);
+  setTimeout(loadDivSheetData, 2000);
+
+  // 60초마다 자동 새로고침 (구글 파이낸스 기준 15~20분 지연이지만 최대한 빠르게)
+  setInterval(loadGoogleSheetData, 60 * 1000);
+  setInterval(loadDivSheetData,    60 * 1000);
+})();
 
 // 샘플 데이터 (시연용)
 holdings = [
