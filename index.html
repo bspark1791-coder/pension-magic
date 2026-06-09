@@ -37,12 +37,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
+/* ── 다크 모드 (기본) ── */
 :root {
   --bg:#0d0f14; --bg2:#13161e; --bg3:#1a1e28; --bg4:#0a0c11;
   --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
   --text:#e8eaf0; --text2:#8a8fa8; --text3:#555a70;
   --pension:#3d8ef0; --irp:#34c97a; --isa:#f0a832; --port:#c97bf0;
   --red:#e85555; --mono:'DM Mono',monospace; --sans:'Noto Sans KR',sans-serif;
+  color-scheme: dark;
+}
+/* ── 라이트 모드 ── */
+[data-theme="light"] {
+  --bg:#f5f7fa; --bg2:#ffffff; --bg3:#eef1f6; --bg4:#e8ecf2;
+  --border:rgba(0,0,0,0.08); --border2:rgba(0,0,0,0.14);
+  --text:#1a1e2e; --text2:#4a5068; --text3:#8a90a8;
+  --pension:#1a6fd4; --irp:#1aa85a; --isa:#d4820a; --port:#9b4dd0;
+  --red:#cc3333;
+  color-scheme: light;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
@@ -379,7 +390,103 @@ h1 span{color:var(--pension)}
 .goal-action-num{width:22px;height:22px;border-radius:50%;background:rgba(52,201,122,0.2);color:var(--irp);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
 .goal-action-text strong{color:var(--text)}
 
-/* ══ 통합 서브탭 ══ */
+/* ════════════════════════════════════
+   모바일 네비 & 테마 토글
+════════════════════════════════════ */
+/* 테마 토글 버튼 */
+.theme-toggle{width:36px;height:36px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s}
+.theme-toggle:hover{background:var(--bg2);transform:rotate(20deg)}
+
+/* 햄버거 버튼 (모바일) */
+.nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none;z-index:201}
+.nav-hamburger span{display:block;width:22px;height:2px;background:var(--text2);border-radius:2px;transition:all 0.25s}
+.nav-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-hamburger.open span:nth-child(2){opacity:0}
+.nav-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* 모바일 메뉴 오버레이 */
+.nav-mobile-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:199}
+.nav-mobile-overlay.open{display:block}
+
+/* 모바일 드로어 */
+.nav-mobile-drawer{position:fixed;top:0;right:-280px;width:270px;height:100%;background:var(--bg2);border-left:1px solid var(--border);z-index:200;transition:right 0.28s cubic-bezier(.4,0,.2,1);padding:80px 20px 30px;display:flex;flex-direction:column;gap:6px;overflow-y:auto}
+.nav-mobile-drawer.open{right:0}
+.nav-mobile-drawer .nav-btn{width:100%;text-align:left;padding:12px 16px;font-size:14px;border-radius:10px}
+.nav-mobile-drawer .nav-user-area{margin-top:auto;padding-top:20px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+
+@media(max-width:768px){
+  /* 햄버거 표시, 기존 nav-btns 숨김 */
+  .nav-hamburger{display:flex}
+  .nav-btns{display:none}
+  .nav-user-area{display:none} /* 드로어 안으로 이동 */
+  .site-nav{padding:12px 16px}
+
+  /* 페이지 패딩 축소 */
+  .page{padding:0 14px 50px}
+
+  /* 헤더 */
+  header h1{font-size:22px}
+  header .header-sub{font-size:12px}
+
+  /* 서브탭 스크롤 */
+  .merged-subtabs{overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%;flex-wrap:nowrap}
+  .msub-btn{white-space:nowrap;flex-shrink:0;padding:8px 14px;font-size:12px}
+
+  /* 계산기 그리드 */
+  .calc-grid{grid-template-columns:1fr !important}
+  .compare-grid{grid-template-columns:1fr !important}
+  .cmp-cards-row{grid-template-columns:1fr !important}
+  .cmp-vs{display:none}
+
+  /* 포트폴리오 */
+  .port-summary{grid-template-columns:1fr 1fr}
+  .port-group-tabs{grid-template-columns:1fr}
+  .port-form-grid{grid-template-columns:1fr !important}
+
+  /* ETF 리스트 테이블 */
+  .etf-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+  /* 배당 달력 */
+  .div-cal-wrap{grid-template-columns:repeat(2,1fr)}
+
+  /* 노후설계 */
+  .goal-monthly-grid{grid-template-columns:1fr 1fr}
+  .goal-input-grid{grid-template-columns:1fr 1fr}
+  .goal-lifestyle-grid{grid-template-columns:1fr 1fr}
+  .goal-risk-grid{grid-template-columns:1fr 1fr}
+
+  /* 절세 캘린더 */
+  .taxcal-wrap{grid-template-columns:1fr}
+  .tc-remain-grid{grid-template-columns:1fr 1fr}
+  .tc-schedule-grid{grid-template-columns:repeat(4,1fr)}
+  .tc-real-cost-wrap{font-size:11px}
+
+  /* ETF 추천 */
+  .rec-macro-grid{grid-template-columns:1fr 1fr}
+
+  /* 비교 */
+  .cmp-common-grid{grid-template-columns:1fr}
+
+  /* 짜장면 비교 카드 */
+  .jja-compare-cards{grid-template-columns:1fr}
+
+  /* 티커 바 */
+  #ticker-bar{padding:5px 12px}
+
+  /* 로그인 */
+  .auth-box{padding:28px 22px;margin:16px}
+
+  /* 통계 카드 */
+  .etf-stats-row{grid-template-columns:repeat(2,1fr)}
+  .stocks-stats-row{grid-template-columns:repeat(3,1fr)}
+}
+
+@media(max-width:400px){
+  .div-cal-wrap{grid-template-columns:1fr}
+  .goal-monthly-grid{grid-template-columns:1fr}
+  .rec-macro-grid{grid-template-columns:1fr}
+  header h1{font-size:19px}
+}
 .merged-subtabs{display:flex;gap:4px;background:var(--bg3);border-radius:10px;padding:4px;margin-bottom:20px;width:fit-content}
 .msub-btn{padding:8px 20px;font-size:13px;font-weight:500;border:none;border-radius:7px;cursor:pointer;background:transparent;color:var(--text3);transition:all 0.2s;font-family:var(--sans)}
 .msub-btn:hover{color:var(--text)}
@@ -1000,6 +1107,13 @@ footer{text-align:center;padding:28px 0 0;font-size:12px;color:var(--text3);bord
              #0d1017;
   display:flex;align-items:center;justify-content:center;
   animation:fadeIn 0.4s ease;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:20px 16px;
+}
+[data-theme="light"] #auth-overlay{
+  background:radial-gradient(ellipse at 60% 40%, rgba(61,142,240,0.08), transparent 60%),
+             #f5f7fa;
 }
 #auth-overlay.hidden{display:none}
 .auth-box{
@@ -1007,6 +1121,12 @@ footer{text-align:center;padding:28px 0 0;font-size:12px;color:var(--text3);bord
   padding:40px 40px 36px;width:100%;max-width:420px;
   box-shadow:0 24px 80px rgba(0,0,0,0.5);
   animation:slideUp 0.4s ease;
+  flex-shrink:0;
+}
+@media(max-width:480px){
+  .auth-box{padding:28px 20px 24px;border-radius:18px}
+  .auth-logo-icon{font-size:36px}
+  .auth-logo-title{font-size:18px}
 }
 @keyframes slideUp{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
 .auth-logo{text-align:center;margin-bottom:28px}
@@ -1052,8 +1172,8 @@ footer{text-align:center;padding:28px 0 0;font-size:12px;color:var(--text3);bord
 <body>
 
 <!-- ══════════════ 로그인 / 회원가입 오버레이 ══════════════ -->
-<div id="auth-overlay">
-  <div class="auth-box">
+<div id="auth-overlay" style="touch-action:auto">
+  <div class="auth-box" onclick="event.stopPropagation()">
     <div class="auth-logo">
       <div class="auth-logo-icon">✨</div>
       <div class="auth-logo-title">연금의 마술사</div>
@@ -1062,8 +1182,8 @@ footer{text-align:center;padding:28px 0 0;font-size:12px;color:var(--text3);bord
 
     <!-- 탭 -->
     <div class="auth-tabs">
-      <button class="auth-tab active" id="tab-login"  onclick="switchAuthTab('login')">로그인</button>
-      <button class="auth-tab"        id="tab-signup" onclick="switchAuthTab('signup')">회원가입</button>
+      <button class="auth-tab active" id="tab-login">로그인</button>
+      <button class="auth-tab"        id="tab-signup">회원가입</button>
     </div>
 
     <!-- 에러 메시지 -->
@@ -1073,43 +1193,36 @@ footer{text-align:center;padding:28px 0 0;font-size:12px;color:var(--text3);bord
     <div id="form-login">
       <div class="auth-field">
         <label>이메일</label>
-        <input type="email" id="login-email" placeholder="example@email.com"
-          onkeydown="if(event.key==='Enter')doLogin()">
+        <input type="email" id="login-email" placeholder="example@email.com" autocomplete="email">
       </div>
       <div class="auth-field">
         <label>비밀번호</label>
-        <input type="password" id="login-pw" placeholder="비밀번호 입력"
-          onkeydown="if(event.key==='Enter')doLogin()">
+        <input type="password" id="login-pw" placeholder="비밀번호 입력" autocomplete="current-password">
       </div>
-      <button class="auth-btn" onclick="doLogin()">🔓 로그인</button>
+      <button class="auth-btn" type="button" id="btn-login">🔓 로그인</button>
       <div class="auth-divider">또는</div>
-      <button class="auth-btn" style="background:linear-gradient(135deg,rgba(240,168,50,0.5),rgba(240,168,50,0.3));box-shadow:none"
-        onclick="doGuest()">👀 둘러보기 (비회원)</button>
+      <button class="auth-btn" type="button" id="btn-guest" style="background:linear-gradient(135deg,rgba(240,168,50,0.5),rgba(240,168,50,0.3));box-shadow:none">👀 둘러보기 (비회원)</button>
     </div>
 
     <!-- 회원가입 폼 -->
     <div id="form-signup" style="display:none">
       <div class="auth-field">
         <label>이름 (닉네임)</label>
-        <input type="text" id="signup-name" placeholder="홍길동"
-          onkeydown="if(event.key==='Enter')doSignup()">
+        <input type="text" id="signup-name" placeholder="홍길동" autocomplete="name">
       </div>
       <div class="auth-field">
         <label>이메일</label>
-        <input type="email" id="signup-email" placeholder="example@email.com"
-          onkeydown="if(event.key==='Enter')doSignup()">
+        <input type="email" id="signup-email" placeholder="example@email.com" autocomplete="email">
       </div>
       <div class="auth-field">
         <label>비밀번호 (6자 이상)</label>
-        <input type="password" id="signup-pw" placeholder="비밀번호 설정"
-          onkeydown="if(event.key==='Enter')doSignup()">
+        <input type="password" id="signup-pw" placeholder="비밀번호 설정" autocomplete="new-password">
       </div>
       <div class="auth-field">
         <label>비밀번호 확인</label>
-        <input type="password" id="signup-pw2" placeholder="비밀번호 재입력"
-          onkeydown="if(event.key==='Enter')doSignup()">
+        <input type="password" id="signup-pw2" placeholder="비밀번호 재입력" autocomplete="new-password">
       </div>
-      <button class="auth-btn" onclick="doSignup()">🚀 회원가입 후 시작하기</button>
+      <button class="auth-btn" type="button" id="btn-signup">🚀 회원가입 후 시작하기</button>
     </div>
 
     <div class="auth-notice">
@@ -1133,20 +1246,44 @@ footer{text-align:center;padding:28px 0 0;font-size:12px;color:var(--text3);bord
 
 <!-- ══════════════ 최상단 네비 ══════════════ -->
 <nav class="site-nav">
+  <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="라이트/다크 전환">🌙</button>
   <div class="nav-btns">
     <button class="nav-btn active" data-page="planner"  onclick="showPage('planner')">📊 플래너</button>
     <button class="nav-btn" data-page="portfolio"        onclick="showPage('portfolio')">💼 포트폴리오</button>
     <button class="nav-btn" data-page="etflist"          onclick="showPage('etflist')">📋 ETF 리스트</button>
     <button class="nav-btn" data-page="market"           onclick="showPage('market')" style="border-color:rgba(52,201,122,0.3);color:var(--irp)">📈 시장현황</button>
     <button class="nav-btn" data-page="insight"          onclick="showPage('insight')" style="border-color:rgba(240,168,50,0.3);color:var(--isa)">💡 인사이트</button>
-    <button class="nav-btn" data-page="etfrec"  onclick="showPage('etfrec')" style="border-color:rgba(201,123,240,0.4);color:var(--port)">📡 시장 나침반</button>
-    <button class="nav-btn" data-page="goalcalc" onclick="showPage('goalcalc')" style="border-color:rgba(232,85,85,0.4);color:var(--red);font-weight:700">🎯 노후설계</button>
+    <button class="nav-btn" data-page="etfrec"           onclick="showPage('etfrec')" style="border-color:rgba(201,123,240,0.4);color:var(--port)">📡 시장 나침반</button>
+    <button class="nav-btn" data-page="goalcalc"         onclick="showPage('goalcalc')" style="border-color:rgba(232,85,85,0.4);color:var(--red);font-weight:700">🎯 노후설계</button>
   </div>
   <div class="nav-user-area">
     <span class="nav-username" id="nav-username"></span>
     <button class="nav-logout-btn" id="nav-logout-btn" onclick="doLogout()" style="display:none">로그아웃</button>
   </div>
+  <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMobileNav()" aria-label="메뉴">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<!-- 모바일 오버레이 -->
+<div class="nav-mobile-overlay" id="nav-mobile-overlay" onclick="closeMobileNav()"></div>
+
+<!-- 모바일 드로어 -->
+<div class="nav-mobile-drawer" id="nav-mobile-drawer">
+  <button class="nav-btn" data-page="planner"  onclick="showPage('planner');closeMobileNav()">📊 플래너</button>
+  <button class="nav-btn" data-page="portfolio" onclick="showPage('portfolio');closeMobileNav()">💼 포트폴리오</button>
+  <button class="nav-btn" data-page="etflist"   onclick="showPage('etflist');closeMobileNav()">📋 ETF 리스트</button>
+  <button class="nav-btn" data-page="market"    onclick="showPage('market');closeMobileNav()">📈 시장현황</button>
+  <button class="nav-btn" data-page="insight"   onclick="showPage('insight');closeMobileNav()">💡 인사이트</button>
+  <button class="nav-btn" data-page="etfrec"    onclick="showPage('etfrec');closeMobileNav()">📡 시장 나침반</button>
+  <button class="nav-btn" data-page="goalcalc"  onclick="showPage('goalcalc');closeMobileNav()">🎯 노후설계</button>
+  <div class="nav-user-area" style="display:flex;margin-top:auto;padding-top:20px;border-top:1px solid var(--border)">
+    <span class="nav-username" id="nav-username-mobile"></span>
+    <button class="nav-logout-btn" id="nav-logout-btn-mobile" onclick="doLogout()" style="display:none">로그아웃</button>
+    <button class="theme-toggle" onclick="toggleTheme()" style="margin-left:auto">🌙</button>
+  </div>
+</div>
+
 
 <!-- ══════════════ 계산기 페이지 ══════════════ -->
 <div id="page-planner" class="page-view active">
@@ -3255,13 +3392,88 @@ function clearAuthError() {
   document.getElementById('auth-error').style.display = 'none';
 }
 
+/* ══ 테마 토글 ══ */
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  localStorage.setItem('pm_theme', isDark ? 'light' : 'dark');
+  document.querySelectorAll('.theme-toggle').forEach(btn => {
+    btn.textContent = isDark ? '☀️' : '🌙';
+  });
+}
+
+// 저장된 테마 복원 (DOM 로드 후)
+function restoreTheme() {
+  const saved = localStorage.getItem('pm_theme') || 'dark';
+  if (saved === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.querySelectorAll('.theme-toggle').forEach(btn => btn.textContent = '☀️');
+  }
+}
+// 저장된 테마 복원 + 인증 버튼 이벤트 연결 (DOM 로드 후 안전하게)
+document.addEventListener('DOMContentLoaded', function() {
+  // 테마 복원
+  restoreTheme();
+
+  // ── 인증 버튼 이벤트 연결 ──
+  const get = id => document.getElementById(id);
+
+  // 탭 전환
+  get('tab-login')?.addEventListener('click',  () => switchAuthTab('login'));
+  get('tab-signup')?.addEventListener('click', () => switchAuthTab('signup'));
+
+  // 로그인
+  get('btn-login')?.addEventListener('click', doLogin);
+  get('login-email')?.addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+  get('login-pw')?.addEventListener('keydown',    e => { if(e.key==='Enter') doLogin(); });
+
+  // 회원가입
+  get('btn-signup')?.addEventListener('click', doSignup);
+  get('signup-name')?.addEventListener('keydown',  e => { if(e.key==='Enter') doSignup(); });
+  get('signup-email')?.addEventListener('keydown', e => { if(e.key==='Enter') doSignup(); });
+  get('signup-pw')?.addEventListener('keydown',    e => { if(e.key==='Enter') doSignup(); });
+  get('signup-pw2')?.addEventListener('keydown',   e => { if(e.key==='Enter') doSignup(); });
+
+  // 비회원
+  get('btn-guest')?.addEventListener('click', doGuest);
+});
+
+/* ══ 모바일 네비 ══ */
+function toggleMobileNav() {
+  const drawer  = document.getElementById('nav-mobile-drawer');
+  const overlay = document.getElementById('nav-mobile-overlay');
+  const burger  = document.getElementById('nav-hamburger');
+  const isOpen  = drawer?.classList.contains('open');
+  if (isOpen) {
+    drawer?.classList.remove('open');
+    overlay?.classList.remove('open');
+    burger?.classList.remove('open');
+  } else {
+    drawer?.classList.add('open');
+    overlay?.classList.add('open');
+    burger?.classList.add('open');
+  }
+}
+function closeMobileNav() {
+  document.getElementById('nav-mobile-drawer')?.classList.remove('open');
+  document.getElementById('nav-mobile-overlay')?.classList.remove('open');
+  document.getElementById('nav-hamburger')?.classList.remove('open');
+}
+
+/* ══ showNavUser — 데스크탑+모바일 동시 반영 ══ */
 function showNavUser(name) {
   const overlay = document.getElementById('auth-overlay');
   if (overlay) overlay.classList.add('hidden');
+  // 데스크탑
   const unEl = document.getElementById('nav-username');
   const lbEl = document.getElementById('nav-logout-btn');
   if (unEl) unEl.textContent = '👤 ' + name;
   if (lbEl) lbEl.style.display = '';
+  // 모바일 드로어
+  const unM = document.getElementById('nav-username-mobile');
+  const lbM = document.getElementById('nav-logout-btn-mobile');
+  if (unM) unM.textContent = '👤 ' + name;
+  if (lbM) lbM.style.display = '';
 }
 
 /* ── 회원가입 ── */
@@ -3561,7 +3773,8 @@ function lineChart(id, labels, datasets) {
 ═══════════════════════════════════════ */
 function showPage(name) {
   document.querySelectorAll('.page-view').forEach(p => p.classList.toggle('active', p.id === 'page-'+name));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === name));
+  // 데스크탑 + 모바일 드로어 버튼 모두 active 동기화
+  document.querySelectorAll('.nav-btn[data-page]').forEach(b => b.classList.toggle('active', b.dataset.page === name));
   if (name === 'portfolio') renderPortfolioCharts();
   if (name === 'etflist')   setTimeout(() => fetchAllPrices(), 300);
   if (name === 'market')    { renderDivCalendar(); setTimeout(loadDivSheetData, 500); }
