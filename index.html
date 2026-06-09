@@ -3691,7 +3691,7 @@ async function saveCloudPortfolio() {
 
 /* ══ 실시간 채팅 (Supabase) ══ */
 const SUPABASE_URL      = 'https://ijkloagczgibmjsfmkcj.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_VuoRz9GdajtvjuB6sQTV9Q_bdjUobLt1V28sxnb7T4g';
+const SUPABASE_ANON_KEY = 'sb_publishable_VuoRz9GdajtvjuB6sQTV9Q_bdjUolNm';
 
 let chatOpen      = false;
 let chatUnreadCnt = 0;
@@ -3735,8 +3735,13 @@ async function initChat() {
 async function loadRecentMessages() {
   try {
     const res  = await fetch(SUPABASE_URL + '/rest/v1/messages?select=*&order=created_at.asc&limit=50', {
-      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+      headers: {
+        'apikey':        SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Content-Type':  'application/json',
+      }
     });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     const msgs = await res.json();
     if (Array.isArray(msgs)) {
       const el = document.getElementById('chat-messages');
@@ -3752,15 +3757,20 @@ function startChatPoll() {
   chatPollTimer = setInterval(async () => {
     try {
       const res  = await fetch(SUPABASE_URL + '/rest/v1/messages?select=*&order=created_at.asc&id=gt.' + chatLastId, {
-        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+        headers: {
+          'apikey':        SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+          'Content-Type':  'application/json',
+        }
       });
+      if (!res.ok) { console.warn('폴링 오류:', res.status); return; }
       const msgs = await res.json();
       if (Array.isArray(msgs) && msgs.length > 0) {
         msgs.forEach(m => { appendChatMessage(m, true); chatLastId = Math.max(chatLastId, m.id); });
         if (!chatOpen) updateChatUnread(chatUnreadCnt + msgs.length);
         if (chatOpen)  scrollChatBottom();
       }
-    } catch(e) {}
+    } catch(e) { console.warn('폴링 실패:', e); }
   }, 2000);
 }
 
@@ -3773,15 +3783,21 @@ async function sendChatMessage() {
   const user = JSON.parse(session);
   input.value = '';
   try {
-    await fetch(SUPABASE_URL + '/rest/v1/messages', {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/messages', {
       method: 'POST',
       headers: {
-        'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-        'Content-Type': 'application/json', 'Prefer': 'return=minimal',
+        'apikey':        SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Content-Type':  'application/json',
+        'Prefer':        'return=representation',
       },
       body: JSON.stringify({ user_name: user.name||'익명', user_email: user.email||'', user_picture: user.picture||'', content }),
     });
-  } catch(e) { console.warn('전송 실패:', e); }
+    if (!res.ok) {
+      const err = await res.text();
+      console.warn('전송 실패:', res.status, err);
+    }
+  } catch(e) { console.warn('전송 오류:', e); }
 }
 
 function appendChatMessage(msg, animate) {
