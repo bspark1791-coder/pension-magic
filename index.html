@@ -4157,8 +4157,8 @@ function showSubTab(page, sub) {
 
 function switchTab(name) {
   document.querySelectorAll('.tabs .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
-  document.querySelectorAll('#page-calculator .panel').forEach(p => p.classList.remove('active'));
-  $('panel-'+name).classList.add('active');
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-'+name)?.classList.add('active');
   if (name === 'combined') calcCombined();
   if (name === 'isa') { calcISA(); calcTransfer(); calcRolling(); }
 }
@@ -7580,6 +7580,7 @@ function renderEtfDivCalendar() {
   }
 }
 
+switchTab('pension'); // 초기 탭 설정
 filterETFList();
 calcIRPAlloc();
 calcPension();
