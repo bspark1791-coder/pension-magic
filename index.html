@@ -1115,17 +1115,8 @@ footer{text-align:center;padding:28px 0 0;font-size:12px;color:var(--text3);bord
 
 
 /* ══ 로그인 / 회원가입 화면 ══ */
-#auth-overlay{
-  position:fixed;inset:0;z-index:9999;
-  background:radial-gradient(ellipse at 60% 40%, rgba(61,142,240,0.12), transparent 60%),
-             radial-gradient(ellipse at 30% 70%, rgba(240,168,50,0.08), transparent 60%),
-             #0d1017;
-  display:flex;align-items:center;justify-content:center;
-  animation:fadeIn 0.4s ease;
-  overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
-  padding:20px 16px;
-}
+#auth-overlay{position:fixed;inset:0;z-index:9999;background:radial-gradient(ellipse at 60% 40%,rgba(61,142,240,0.12),transparent 60%),radial-gradient(ellipse at 30% 70%,rgba(240,168,50,0.08),transparent 60%),#0d1017;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.4s ease;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px 16px}
+#auth-overlay.hidden{display:none}
 [data-theme="light"] #auth-overlay{
   background:radial-gradient(ellipse at 60% 40%, rgba(61,142,240,0.08), transparent 60%),
              #f5f7fa;
@@ -1187,7 +1178,7 @@ footer{text-align:center;padding:28px 0 0;font-size:12px;color:var(--text3);bord
 <body>
 
 <!-- ══════════════ 로그인 / 회원가입 오버레이 ══════════════ -->
-<div id="auth-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:#0d1017;align-items:center;justify-content:center;padding:20px;overflow-y:auto;touch-action:auto">
+<div id="auth-overlay">
   <div class="auth-box" onclick="event.stopPropagation()">
     <div class="auth-logo">
       <div class="auth-logo-icon">✨</div>
@@ -3533,11 +3524,11 @@ function doLogout() {
 ════════════════════════════════════════ */
 // initAuth는 아래 DOMContentLoaded에서 호출
 function initAuth() {
-  // 구글 콜백이 있으면 스킵
+  // 구글 콜백이 있으면 handleGoogleCallback이 처리
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('auth') === 'success') return;
 
-  // 저장된 세션 확인
+  // 세션 확인 (localStorage 우선 — 구글 로그인 지원)
   const session = sessionStorage.getItem('pm_session') || localStorage.getItem('pm_session');
   if (session) {
     try {
@@ -3547,9 +3538,9 @@ function initAuth() {
       return;
     } catch(e) {}
   }
-  // 세션 없으면 오버레이 표시
+  // 로그인 필요
   const ov = document.getElementById('auth-overlay');
-  if (ov) ov.style.display = 'flex';
+  if (ov) ov.classList.remove('hidden');
 }
 
 
@@ -7589,23 +7580,13 @@ function renderEtfDivCalendar() {
   }
 }
 
-// ── 안전한 초기화 (에러가 나도 다음 함수 실행 보장) ──
-(function safeInit() {
-  const fns = [
-    () => filterETFList(),
-    () => calcIRPAlloc(),
-    () => calcPension(),
-    () => renderSalaryGrid(),
-    () => renderJjajangChart(),
-    () => renderDivGrid(),
-    () => renderNews(),
-    () => renderDivCalendar(),
-    () => calcGoal(),
-    () => renderMacroRec(),
-    () => calcCompare(),
-  ];
-  fns.forEach(fn => { try { fn(); } catch(e) { console.warn('init 오류:', e.message); } });
-})();
+filterETFList();
+calcIRPAlloc();
+calcPension();
+renderSalaryGrid();
+renderJjajangChart();
+renderDivGrid();
+renderNews();
 
 /* ── 앱 시작 시 구글 시트 자동 연동 ── */
 (function autoLoadSheets() {
