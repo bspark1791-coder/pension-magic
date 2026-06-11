@@ -492,7 +492,29 @@ h1 span{color:var(--pension)}
 .msub-btn{padding:8px 20px;font-size:13px;font-weight:500;border:none;border-radius:7px;cursor:pointer;background:transparent;color:var(--text3);transition:all 0.2s;font-family:var(--sans)}
 .msub-btn:hover{color:var(--text)}
 .msub-btn.active{background:var(--bg);color:var(--text);font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.25)}
-/* ══ 채팅 ══ */
+/* ══ 경제 이벤트 ══ */
+.eco-filter,.eco-imp{padding:6px 14px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);cursor:pointer;font-size:12px;font-weight:500;color:var(--text2);font-family:var(--sans);transition:all 0.2s}
+.eco-filter.active,.eco-imp.active{background:rgba(61,142,240,0.15);border-color:rgba(61,142,240,0.4);color:var(--pension)}
+.eco-month-group{margin-bottom:32px}
+.eco-month-title{font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.eco-event-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;transition:border-color 0.2s;cursor:default}
+.eco-event-card:hover{border-color:var(--border2)}
+.eco-event-card.imp-high{border-left:3px solid var(--red)}
+.eco-event-card.imp-mid{border-left:3px solid var(--isa)}
+.eco-event-card.imp-low{border-left:3px solid var(--irp)}
+.eco-event-date{min-width:70px;text-align:center;background:var(--bg3);border-radius:8px;padding:6px 10px}
+.eco-event-date-day{font-size:18px;font-weight:800;color:var(--text);font-family:var(--mono)}
+.eco-event-date-month{font-size:10px;color:var(--text3);margin-top:2px}
+.eco-event-info{flex:1}
+.eco-event-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.eco-event-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.eco-event-country{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--bg3);color:var(--text3)}
+.eco-event-category{font-size:11px;color:var(--text3)}
+.eco-event-imp{font-size:11px;font-weight:600}
+.eco-event-values{text-align:right;min-width:90px}
+.eco-event-prev{font-size:11px;color:var(--text3)}
+.eco-event-forecast{font-size:12px;font-weight:600;color:var(--pension);margin-top:2px}
+@media(max-width:600px){.eco-event-card{flex-wrap:wrap}.eco-event-values{min-width:unset;text-align:left}}
 .chat-msg{display:flex;gap:8px;align-items:flex-start}
 .chat-msg.mine{flex-direction:row-reverse}
 .chat-avatar{width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text2)}
@@ -2587,6 +2609,7 @@ footer{text-align:center;padding:28px 0 0;font-size:12px;color:var(--text3);bord
   <div class="merged-subtabs">
     <button class="msub-btn active" data-sub="dividend" onclick="showSubTab('market','dividend')">📅 배당달력</button>
     <button class="msub-btn" data-sub="etfdiv" onclick="showSubTab('market','etfdiv')" style="color:var(--isa)">📦 ETF 배당</button>
+    <button class="msub-btn" data-sub="events" onclick="showSubTab('market','events')" style="color:var(--pension)">🌐 경제 이벤트</button>
     <!-- 실시간주가 탭 숨김 (활성화 필요 시 요청)
     <button class="msub-btn" data-sub="stocks" onclick="showSubTab('market','stocks')" style="color:var(--irp)">📡 실시간주가</button>
     -->
@@ -2655,6 +2678,40 @@ footer{text-align:center;padding:28px 0 0;font-size:12px;color:var(--text3);bord
   </div>
 </div>
   </div><!-- /market-etfdiv -->
+
+  <!-- ══ 경제 이벤트 캘린더 ══ -->
+  <div id="market-events" class="msub-panel" style="display:none">
+  <div class="page">
+    <header>
+      <div class="header-badge" style="color:var(--pension);background:rgba(61,142,240,0.1);border-color:rgba(61,142,240,0.2)">ECONOMIC CALENDAR</div>
+      <h1>🌐 경제 <span style="color:var(--pension)">이벤트</span></h1>
+      <p class="header-sub">국가별 CPI·금리·고용 등 주요 경제 지표 발표 일정</p>
+    </header>
+
+    <!-- 국가 필터 -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px" id="event-country-filter">
+      <button class="eco-filter active" data-country="all" onclick="filterEcoEvents('all')">🌍 전체</button>
+      <button class="eco-filter" data-country="US" onclick="filterEcoEvents('US')">🇺🇸 미국</button>
+      <button class="eco-filter" data-country="KR" onclick="filterEcoEvents('KR')">🇰🇷 한국</button>
+      <button class="eco-filter" data-country="EU" onclick="filterEcoEvents('EU')">🇪🇺 유럽</button>
+      <button class="eco-filter" data-country="JP" onclick="filterEcoEvents('JP')">🇯🇵 일본</button>
+      <button class="eco-filter" data-country="CN" onclick="filterEcoEvents('CN')">🇨🇳 중국</button>
+    </div>
+
+    <!-- 중요도 필터 -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">
+      <button class="eco-imp active" data-imp="all" onclick="filterEcoImp('all')">전체</button>
+      <button class="eco-imp" data-imp="high" onclick="filterEcoImp('high')" style="color:#e85555">🔴 높음</button>
+      <button class="eco-imp" data-imp="mid" onclick="filterEcoImp('mid')" style="color:#f0a832">🟡 중간</button>
+      <button class="eco-imp" data-imp="low" onclick="filterEcoImp('low')" style="color:#34c97a">🟢 낮음</button>
+    </div>
+
+    <!-- 이벤트 리스트 -->
+    <div id="eco-events-list"></div>
+
+    <footer><p>경제 지표 발표 일정은 참고용이며 실제 일정과 다를 수 있습니다. 투자 결정 전 공식 발표 기관을 확인하세요.</p></footer>
+  </div>
+  </div><!-- /market-events -->
 
   <div id="market-stocks" class="msub-panel" style="display:none">
 <div class="page">
@@ -3711,6 +3768,151 @@ async function saveCloudPortfolio() {
   }
 }
 
+/* ══ 경제 이벤트 캘린더 ══ */
+const ECO_EVENTS = [
+  // ── 미국 ──
+  { date:'2025-07-02', country:'US', flag:'🇺🇸', title:'비농업 고용 (NFP)', category:'고용', imp:'high', prev:'272K', forecast:'185K' },
+  { date:'2025-07-10', country:'US', flag:'🇺🇸', title:'소비자물가지수 (CPI)', category:'물가', imp:'high', prev:'3.3%', forecast:'3.1%' },
+  { date:'2025-07-11', country:'US', flag:'🇺🇸', title:'생산자물가지수 (PPI)', category:'물가', imp:'mid', prev:'2.2%', forecast:'2.1%' },
+  { date:'2025-07-17', country:'US', flag:'🇺🇸', title:'소매판매 (Retail Sales)', category:'소비', imp:'mid', prev:'0.1%', forecast:'0.2%' },
+  { date:'2025-07-26', country:'US', flag:'🇺🇸', title:'GDP 성장률 (2분기 예비)', category:'성장', imp:'high', prev:'1.4%', forecast:'1.8%' },
+  { date:'2025-07-30', country:'US', flag:'🇺🇸', title:'FOMC 금리 결정', category:'금리', imp:'high', prev:'5.25~5.50%', forecast:'동결' },
+  { date:'2025-08-02', country:'US', flag:'🇺🇸', title:'비농업 고용 (NFP)', category:'고용', imp:'high', prev:'185K', forecast:'190K' },
+  { date:'2025-08-13', country:'US', flag:'🇺🇸', title:'소비자물가지수 (CPI)', category:'물가', imp:'high', prev:'3.1%', forecast:'3.0%' },
+  { date:'2025-09-17', country:'US', flag:'🇺🇸', title:'FOMC 금리 결정', category:'금리', imp:'high', prev:'5.25~5.50%', forecast:'인하 가능' },
+  { date:'2025-09-26', country:'US', flag:'🇺🇸', title:'PCE 물가지수', category:'물가', imp:'high', prev:'2.6%', forecast:'2.5%' },
+  { date:'2025-10-03', country:'US', flag:'🇺🇸', title:'비농업 고용 (NFP)', category:'고용', imp:'high', prev:'190K', forecast:'185K' },
+  { date:'2025-10-10', country:'US', flag:'🇺🇸', title:'소비자물가지수 (CPI)', category:'물가', imp:'high', prev:'3.0%', forecast:'2.9%' },
+  { date:'2025-11-07', country:'US', flag:'🇺🇸', title:'FOMC 금리 결정', category:'금리', imp:'high', prev:'5.25~5.50%', forecast:'인하 예상' },
+  { date:'2025-12-18', country:'US', flag:'🇺🇸', title:'FOMC 금리 결정', category:'금리', imp:'high', prev:'5.00~5.25%', forecast:'-' },
+
+  // ── 한국 ──
+  { date:'2025-07-04', country:'KR', flag:'🇰🇷', title:'소비자물가지수 (CPI)', category:'물가', imp:'high', prev:'2.7%', forecast:'2.5%' },
+  { date:'2025-07-11', country:'KR', flag:'🇰🇷', title:'한국은행 금통위 금리 결정', category:'금리', imp:'high', prev:'3.50%', forecast:'동결' },
+  { date:'2025-07-25', country:'KR', flag:'🇰🇷', title:'GDP 성장률 (2분기)', category:'성장', imp:'high', prev:'1.3%', forecast:'1.5%' },
+  { date:'2025-08-01', country:'KR', flag:'🇰🇷', title:'소비자물가지수 (CPI)', category:'물가', imp:'high', prev:'2.5%', forecast:'2.4%' },
+  { date:'2025-08-22', country:'KR', flag:'🇰🇷', title:'한국은행 금통위 금리 결정', category:'금리', imp:'high', prev:'3.50%', forecast:'인하 가능' },
+  { date:'2025-09-05', country:'KR', flag:'🇰🇷', title:'소비자물가지수 (CPI)', category:'물가', imp:'high', prev:'2.4%', forecast:'2.3%' },
+  { date:'2025-10-16', country:'KR', flag:'🇰🇷', title:'한국은행 금통위 금리 결정', category:'금리', imp:'high', prev:'3.25%', forecast:'-' },
+  { date:'2025-11-28', country:'KR', flag:'🇰🇷', title:'한국은행 금통위 금리 결정', category:'금리', imp:'high', prev:'3.25%', forecast:'-' },
+
+  // ── 유럽 ──
+  { date:'2025-07-17', country:'EU', flag:'🇪🇺', title:'ECB 금리 결정', category:'금리', imp:'high', prev:'4.25%', forecast:'인하 가능' },
+  { date:'2025-07-18', country:'EU', flag:'🇪🇺', title:'유로존 CPI (확정)', category:'물가', imp:'mid', prev:'2.6%', forecast:'2.5%' },
+  { date:'2025-07-30', country:'EU', flag:'🇪🇺', title:'유로존 GDP (2분기 예비)', category:'성장', imp:'high', prev:'0.3%', forecast:'0.3%' },
+  { date:'2025-09-12', country:'EU', flag:'🇪🇺', title:'ECB 금리 결정', category:'금리', imp:'high', prev:'4.00%', forecast:'-' },
+  { date:'2025-10-17', country:'EU', flag:'🇪🇺', title:'ECB 금리 결정', category:'금리', imp:'high', prev:'3.75%', forecast:'-' },
+  { date:'2025-12-12', country:'EU', flag:'🇪🇺', title:'ECB 금리 결정', category:'금리', imp:'high', prev:'3.50%', forecast:'-' },
+
+  // ── 일본 ──
+  { date:'2025-07-25', country:'JP', flag:'🇯🇵', title:'일본은행 (BOJ) 금리 결정', category:'금리', imp:'high', prev:'0.10%', forecast:'동결' },
+  { date:'2025-07-19', country:'JP', flag:'🇯🇵', title:'일본 CPI', category:'물가', imp:'mid', prev:'2.8%', forecast:'2.7%' },
+  { date:'2025-09-19', country:'JP', flag:'🇯🇵', title:'일본은행 (BOJ) 금리 결정', category:'금리', imp:'high', prev:'0.10%', forecast:'-' },
+  { date:'2025-10-31', country:'JP', flag:'🇯🇵', title:'일본은행 (BOJ) 금리 결정', category:'금리', imp:'high', prev:'0.25%', forecast:'-' },
+  { date:'2025-12-19', country:'JP', flag:'🇯🇵', title:'일본은행 (BOJ) 금리 결정', category:'금리', imp:'high', prev:'0.25%', forecast:'-' },
+
+  // ── 중국 ──
+  { date:'2025-07-09', country:'CN', flag:'🇨🇳', title:'중국 CPI', category:'물가', imp:'mid', prev:'0.3%', forecast:'0.4%' },
+  { date:'2025-07-15', country:'CN', flag:'🇨🇳', title:'중국 GDP (2분기)', category:'성장', imp:'high', prev:'5.3%', forecast:'5.1%' },
+  { date:'2025-07-15', country:'CN', flag:'🇨🇳', title:'중국 소매판매', category:'소비', imp:'mid', prev:'3.7%', forecast:'4.0%' },
+  { date:'2025-08-09', country:'CN', flag:'🇨🇳', title:'중국 CPI', category:'물가', imp:'mid', prev:'0.4%', forecast:'0.5%' },
+  { date:'2025-09-09', country:'CN', flag:'🇨🇳', title:'중국 CPI', category:'물가', imp:'mid', prev:'0.5%', forecast:'-' },
+];
+
+let ecoCountryFilter = 'all';
+let ecoImpFilter = 'all';
+
+function filterEcoEvents(country) {
+  ecoCountryFilter = country;
+  document.querySelectorAll('.eco-filter').forEach(b =>
+    b.classList.toggle('active', b.dataset.country === country)
+  );
+  renderEcoEvents();
+}
+
+function filterEcoImp(imp) {
+  ecoImpFilter = imp;
+  document.querySelectorAll('.eco-imp').forEach(b =>
+    b.classList.toggle('active', b.dataset.imp === imp)
+  );
+  renderEcoEvents();
+}
+
+function renderEcoEvents() {
+  const el = document.getElementById('eco-events-list');
+  if (!el) return;
+
+  // 필터 적용
+  let filtered = ECO_EVENTS.filter(ev => {
+    const countryOk = ecoCountryFilter === 'all' || ev.country === ecoCountryFilter;
+    const impOk     = ecoImpFilter    === 'all' || ev.imp    === ecoImpFilter;
+    return countryOk && impOk;
+  });
+
+  // 날짜순 정렬
+  filtered.sort((a, b) => a.date.localeCompare(b.date));
+
+  if (!filtered.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">해당 조건의 이벤트가 없습니다</div>';
+    return;
+  }
+
+  // 월별 그룹화
+  const groups = {};
+  filtered.forEach(ev => {
+    const d     = new Date(ev.date);
+    const key   = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+    const label = d.getFullYear() + '년 ' + (d.getMonth()+1) + '월';
+    if (!groups[key]) groups[key] = { label, events: [] };
+    groups[key].events.push(ev);
+  });
+
+  const impIcon  = { high:'🔴', mid:'🟡', low:'🟢' };
+  const impLabel = { high:'높음', mid:'중간', low:'낮음' };
+  const catColor = {
+    '금리':  'var(--pension)',
+    '물가':  'var(--red)',
+    '고용':  'var(--irp)',
+    '성장':  'var(--isa)',
+    '소비':  'var(--port)',
+    '무역':  'var(--text2)',
+  };
+
+  el.innerHTML = Object.values(groups).map(group => `
+    <div class="eco-month-group">
+      <div class="eco-month-title">${group.label}</div>
+      ${group.events.map(ev => {
+        const d     = new Date(ev.date);
+        const day   = d.getDate();
+        const month = (d.getMonth()+1) + '월';
+        const dow   = ['일','월','화','수','목','금','토'][d.getDay()];
+        const today = new Date();
+        const isPast = d < today;
+        return `
+        <div class="eco-event-card imp-${ev.imp}" style="${isPast ? 'opacity:0.55' : ''}">
+          <div class="eco-event-date">
+            <div class="eco-event-date-day">${day}</div>
+            <div class="eco-event-date-month">${month} (${dow})</div>
+          </div>
+          <div class="eco-event-info">
+            <div class="eco-event-title">${ev.flag} ${ev.title}</div>
+            <div class="eco-event-meta">
+              <span class="eco-event-country">${ev.country}</span>
+              <span class="eco-event-category" style="color:${catColor[ev.category]||'var(--text3)'}">${ev.category}</span>
+              <span class="eco-event-imp">${impIcon[ev.imp]} ${impLabel[ev.imp]}</span>
+              ${isPast ? '<span style="font-size:11px;color:var(--text3)">발표완료</span>' : ''}
+            </div>
+          </div>
+          <div class="eco-event-values">
+            <div class="eco-event-prev">이전: ${ev.prev}</div>
+            <div class="eco-event-forecast">예상: ${ev.forecast}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  `).join('');
+}
+
 /* ══ 실시간 채팅 (Supabase) ══ */
 const SUPABASE_URL      = 'https://ijkloagczgibmjsfmkcj.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_VuoRz9GdajtvjuB6sQTV9Q_bdjUolNm';
@@ -4151,6 +4353,7 @@ function showSubTab(page, sub) {
   if (page === 'insight' && sub === 'about')    { renderSalaryGrid(); setTimeout(renderJjajangChart, 100); stopNewsAutoRefresh(); }
   if (page === 'insight' && sub === 'news')     { loadNews(); startNewsAutoRefresh(); }
   if (page === 'market'  && sub === 'dividend') { renderDivCalendar(); setTimeout(loadDivSheetData, 300); }
+  if (page === 'market'  && sub === 'events')   { renderEcoEvents(); }
   if (page === 'market'  && sub === 'etfdiv')   renderEtfDivCalendar();
   if (page === 'market'  && sub === 'stocks')   initStocksPage();
 }
