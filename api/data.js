@@ -1,104 +1,143 @@
-// 포트폴리오 데이터 저장/불러오기 — 구글 시트 API 사용
-// GET  /api/data?email=xxx&token=xxx  → 포트폴리오 불러오기
-// POST /api/data                       → 포트폴리오 저장
+// Vercel Serverless Function — RSS 뉴스 자동 수집
+// 네이버 금융·연합뉴스 RSS → JSON으로 변환해서 브라우저에 전달
 
-const SHEET_ID = process.env.PORTFOLIO_SHEET_ID; // Vercel 환경변수
+const RSS_FEEDS = [
+  {
+    name: '네이버 금융',
+    url: 'https://finance.naver.com/rss/news.nhn',
+    category: '📈 시장',
+  },
+  {
+    name: '연합뉴스 경제',
+    url: 'https://www.yonhapnewstv.co.kr/category/news/economy/feed/',
+    category: '🌏 글로벌',
+  },
+  {
+    name: '연합뉴스 금융',
+    url: 'https://feeds.yonhapnews.co.kr/rss/0200000000',
+    category: '📈 시장',
+  },
+];
 
-// 구글 시트에서 이메일로 행 찾기
-async function findUserRow(token, email) {
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Users!A:B`;
-  const res  = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  const data = await res.json();
-  if (!data.values) return -1;
-  return data.values.findIndex(row => row[0] === email);
+// RSS XML → 뉴스 배열로 파싱
+function parseRSS(xml, category) {
+  const items = [];
+  const itemRegex = /<item[^>]*>([\s\S]*?)<\/item>/g;
+  let match;
+
+  while ((match = itemRegex.exec(xml)) !== null) {
+    const item = match[1];
+
+    const title = extractTag(item, 'title');
+    const link  = extractTag(item, 'link');
+    const desc  = extractTag(item, 'description');
+    const pubDate = extractTag(item, 'pubDate');
+
+    if (!title || !link) continue;
+
+    // 광고·무의미한 항목 필터
+    if (title.length < 5) continue;
+
+    items.push({
+      title:    cleanText(title),
+      link:     cleanText(link),
+      summary:  cleanText(desc).substring(0, 120),
+      date:     formatDate(pubDate),
+      category,
+      importance: '🟡',
+    });
+  }
+
+  return items;
+}
+
+function extractTag(xml, tag) {
+  const regex = new RegExp(`<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?<\\/${tag}>`, 'i');
+  const match = xml.match(regex);
+  return match ? match[1].trim() : '';
+}
+
+function cleanText(text) {
+  return text
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ')
+    .trim();
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    const month = d.getMonth() + 1;
+    const day   = d.getDate();
+    const hour  = d.getHours().toString().padStart(2, '0');
+    const min   = d.getMinutes().toString().padStart(2, '0');
+    return `${month}/${day} ${hour}:${min}`;
+  } catch(e) {
+    return '';
+  }
 }
 
 export default async function handler(req, res) {
+  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  if (req.method === 'OPTIONS') return res.status(200).end();
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=600'); // 10분 캐시
 
-  const token = req.headers.authorization?.replace('Bearer ', '') || req.query.token;
-  if (!token) return res.status(401).json({ error: '인증 토큰 필요' });
+  const allNews = [];
 
-  // ── GET: 포트폴리오 불러오기 ──
-  if (req.method === 'GET') {
-    const { email } = req.query;
-    if (!email) return res.status(400).json({ error: 'email 필요' });
-
-    try {
-      const rowIdx = await findUserRow(token, email);
-      if (rowIdx === -1) {
-        return res.status(200).json({ ok: true, data: null, message: '신규 사용자' });
-      }
-
-      // 해당 행의 데이터 열(C열) 읽기
-      const row     = rowIdx + 1; // 1-indexed
-      const dataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Users!C${row}`;
-      const dataRes = await fetch(dataUrl, {
-        headers: { Authorization: `Bearer ${token}` },
+  // 모든 RSS 피드 병렬 fetch
+  const results = await Promise.allSettled(
+    RSS_FEEDS.map(async (feed) => {
+      const response = await fetch(feed.url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; PensionMagic/1.0)',
+          'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+        },
+        signal: AbortSignal.timeout(5000), // 5초 타임아웃
       });
-      const dataJson = await dataRes.json();
-      const raw      = dataJson.values?.[0]?.[0] || null;
 
-      return res.status(200).json({
-        ok:   true,
-        data: raw ? JSON.parse(raw) : null,
-      });
-    } catch (err) {
-      return res.status(500).json({ error: err.message });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const xml = await response.text();
+      const items = parseRSS(xml, feed.category);
+      return items;
+    })
+  );
+
+  // 성공한 피드만 합치기
+  for (const result of results) {
+    if (result.status === 'fulfilled') {
+      allNews.push(...result.value);
     }
   }
 
-  // ── POST: 포트폴리오 저장 ──
-  if (req.method === 'POST') {
-    const { email, name, portfolio } = req.body || {};
-    if (!email || portfolio === undefined) {
-      return res.status(400).json({ error: 'email, portfolio 필요' });
-    }
+  // 최신순 정렬 + 중복 제거 + 최대 20개
+  const seen = new Set();
+  const unique = allNews.filter(item => {
+    if (seen.has(item.title)) return false;
+    seen.add(item.title);
+    return true;
+  }).slice(0, 20);
 
-    try {
-      const rowIdx    = await findUserRow(token, email);
-      const now       = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
-      const dataStr   = JSON.stringify(portfolio);
-
-      if (rowIdx === -1) {
-        // 신규 사용자 — 새 행 추가
-        const appendUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Users!A:D:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`;
-        await fetch(appendUrl, {
-          method: 'POST',
-          headers: {
-            Authorization:  `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            values: [[email, name || '', dataStr, now]],
-          }),
-        });
-      } else {
-        // 기존 사용자 — 해당 행 업데이트
-        const row       = rowIdx + 1;
-        const updateUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Users!C${row}:D${row}?valueInputOption=RAW`;
-        await fetch(updateUrl, {
-          method: 'PUT',
-          headers: {
-            Authorization:  `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            values: [[dataStr, now]],
-          }),
-        });
-      }
-
-      return res.status(200).json({ ok: true, saved: now });
-    } catch (err) {
-      return res.status(500).json({ error: err.message });
-    }
+  if (unique.length === 0) {
+    return res.status(200).json({
+      ok: false,
+      message: 'RSS 수집 실패 — 기본 뉴스를 표시합니다',
+      news: [],
+    });
   }
 
-  return res.status(405).json({ error: '허용되지 않는 메서드' });
+  return res.status(200).json({
+    ok: true,
+    count: unique.length,
+    updated: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
+    news: unique,
+  });
 }
