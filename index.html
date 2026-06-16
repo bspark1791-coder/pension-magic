@@ -36,7 +36,284 @@
 </script>
 
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js">
+/* ════════════════════════════════════════
+   유틸리티
+════════════════════════════════════════ */
+function fmtNum(n) {
+  if (n === undefined || n === null || isNaN(n)) return '—';
+  return Math.round(n).toLocaleString('ko-KR');
+}
+function fmtWon(n) { return fmtNum(n) + '만원'; }
+
+function applyCommaEl(id) {
+  // 숫자 입력창 포맷 (기존 oninput과 충돌 방지 — 값만 유지)
+}
+
+function syncRateSlider(prefix) {
+  const slider = document.getElementById(prefix + '-rate');
+  const input  = document.getElementById(prefix + '-rate-input');
+  const label  = document.getElementById(prefix + '-rate-val');
+  if (!slider) return;
+  const val = parseFloat(slider.value);
+  if (input) input.value = val;
+  if (label) label.textContent = val + '%';
+  if (prefix === 'p') calcPension();
+  if (prefix === 'i') calcIRP();
+  if (prefix === 's') calcISA();
+}
+
+function syncRateInput(prefix) {
+  const input  = document.getElementById(prefix + '-rate-input');
+  const slider = document.getElementById(prefix + '-rate');
+  const label  = document.getElementById(prefix + '-rate-val');
+  if (!input) return;
+  let val = parseFloat(input.value);
+  if (isNaN(val)) val = 5;
+  val = Math.min(20, Math.max(1, val));
+  if (slider) slider.value = val;
+  if (label) label.textContent = val + '%';
+  if (prefix === 'p') calcPension();
+  if (prefix === 'i') calcIRP();
+  if (prefix === 's') calcISA();
+}
+
+/* ════════════════════════════════════════
+   페이지 전환
+════════════════════════════════════════ */
+const PAGE_IDS = ['planner','portfolio','etflist','market','insight','etfrec','goalcalc'];
+
+const SUB_MAP = {
+  planner:  ['calculator','taxcal','compare'],
+  market:   ['dividend','etfdiv','events','stocks'],
+  insight:  ['about','news'],
+};
+
+function showPage(name) {
+  PAGE_IDS.forEach(id => {
+    const el = document.getElementById('page-' + id);
+    if (el) el.style.display = 'none';
+  });
+  const target = document.getElementById('page-' + name);
+  if (target) target.style.display = '';
+
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.page === name);
+  });
+
+  // 기본 서브탭 활성화
+  if (SUB_MAP[name]) showSubTab(name, SUB_MAP[name][0]);
+
+  if (name === 'etflist' && typeof filterETFList === 'function') filterETFList();
+  if (name === 'goalcalc' && typeof calcIRPAlloc === 'function') calcIRPAlloc();
+  window.scrollTo(0, 0);
+}
+
+function showSubTab(page, sub) {
+  const subs = SUB_MAP[page];
+  if (!subs) return;
+  subs.forEach(s => {
+    const el = document.getElementById(page + '-' + s);
+    if (el) el.style.display = (s === sub) ? '' : 'none';
+  });
+  document.querySelectorAll(`#page-${page} .msub-btn`).forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.sub === sub);
+  });
+  // 서브탭 진입 시 계산 실행
+  if (page === 'planner' && sub === 'calculator') { calcPension(); calcIRP(); calcISA(); }
+  if (page === 'market'  && sub === 'dividend' && typeof renderDividendCalendar === 'function') renderDividendCalendar();
+}
+
+/* ════════════════════════════════════════
+   계산기 탭 전환 (개인연금/IRP/ISA/통합)
+════════════════════════════════════════ */
+function switchTab(tab) {
+  ['pension','irp','isa','combined'].forEach(t => {
+    const el = document.getElementById('panel-' + t);
+    if (el) el.style.display = (t === tab) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab[data-tab]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tab);
+  });
+  if (tab === 'pension')  calcPension();
+  if (tab === 'irp')      calcIRP();
+  if (tab === 'isa')      calcISA();
+  if (tab === 'combined') calcCompare();
+}
+
+/* ════════════════════════════════════════
+   나이 설정
+════════════════════════════════════════ */
+function setStopAge(prefix, age) {
+  document.querySelectorAll(`.age-btn[data-stop]`).forEach(btn => {
+    if (btn.closest('#' + prefix + '-stop-group') || btn.closest('#' + (prefix==='p'?'panel-pension':'panel-irp'))) {
+      btn.classList.toggle('active', parseInt(btn.dataset.stop) === age);
+    }
+  });
+  // prefix별 그룹 버튼 active
+  const grp = document.getElementById(prefix + '-stop-group') || document.getElementById(prefix + '-age-group');
+  if (grp) {
+    grp.querySelectorAll('.age-btn').forEach(btn => {
+      btn.classList.toggle('active', parseInt(btn.dataset.stop) === age);
+    });
+  }
+  if (prefix === 'p') calcPension();
+  if (prefix === 'i') calcIRP();
+}
+
+function setAge(prefix, age) { setStopAge(prefix, age); }
+
+/* ════════════════════════════════════════
+   개인연금 계산
+════════════════════════════════════════ */
+function calcPension() {
+  const monthly   = parseFloat(document.getElementById('p-monthly')?.value) || 30;
+  const birthYear = parseInt(document.getElementById('p-birth-year')?.value)  || 1990;
+  const birthMonth= parseInt(document.getElementById('p-birth-month')?.value) || 1;
+  const rateEl    = document.getElementById('p-rate');
+  const rate      = rateEl ? parseFloat(rateEl.value) / 100 : 0.05;
+  const taxEl     = document.getElementById('p-taxrate');
+  const taxRate   = taxEl ? parseFloat(taxEl.value) / 100 : 0.033;
+
+  // 납입 종료 나이 (active 버튼)
+  let stopAge = 55;
+  const stopGrp = document.getElementById('p-stop-group') || document.getElementById('p-age-group');
+  if (stopGrp) {
+    const activeBtn = stopGrp.querySelector('.age-btn.active');
+    if (activeBtn) stopAge = parseInt(activeBtn.dataset.stop) || 55;
+  }
+
+  const now = new Date();
+  const ageNow = now.getFullYear() - birthYear + (now.getMonth() + 1 >= birthMonth ? 0 : -1);
+  const years  = Math.max(1, stopAge - ageNow);
+
+  // 납입 기간 표시
+  const yrEl = document.getElementById('p-years-display');
+  if (yrEl) yrEl.textContent = `납입 기간: ${years}년 (${ageNow}세 → ${stopAge}세)`;
+
+  // 복리 계산 (월 복리)
+  const monthlyRate = rate / 12;
+  const n = years * 12;
+  const totalIn  = monthly * n;  // 만원
+  const totalOut = monthly * ((Math.pow(1 + monthlyRate, n) - 1) / monthlyRate) * (1 + monthlyRate);
+  const profit   = totalOut - totalIn;
+  const tax      = totalIn * taxRate * years; // 연 세액공제
+
+  // 결과 업데이트
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('p-total-in',  fmtWon(totalIn));
+  set('p-total-out', fmtWon(Math.round(totalOut)));
+  set('p-profit',    fmtWon(Math.round(profit)));
+  set('p-tax',       fmtWon(Math.round(tax)));
+
+  // 타임라인
+  set('p-tl-pay',      years + '년');
+  set('p-tl-pay-sub',  fmtWon(totalIn));
+  set('p-stop-value',  fmtWon(Math.round(totalOut)));
+  set('p-total-out-val', fmtWon(Math.round(totalOut)));
+
+  // 세액공제 안내
+  const taxRefEl = document.getElementById('p-tax-refund-amt');
+  const annualTaxRefund = Math.min(monthly * 12, 600) * taxRate;
+  if (taxRefEl) taxRefEl.textContent = fmtWon(Math.round(annualTaxRefund)) + '/년';
+}
+
+/* ════════════════════════════════════════
+   IRP 계산
+════════════════════════════════════════ */
+function calcIRP() {
+  const monthly    = parseFloat(document.getElementById('i-monthly')?.value) || 30;
+  const birthYear  = parseInt(document.getElementById('i-birth-year')?.value)  || 1990;
+  const birthMonth = parseInt(document.getElementById('i-birth-month')?.value) || 1;
+  const rateEl     = document.getElementById('i-rate');
+  const rate       = rateEl ? parseFloat(rateEl.value) / 100 : 0.08;
+  const taxEl      = document.getElementById('i-taxrate');
+  const taxRate    = taxEl ? parseFloat(taxEl.value) / 100 : 0.033;
+
+  // 위험/안전 비율
+  const riskRatioEl = document.getElementById('i-risk-ratio');
+  const riskRatio   = riskRatioEl ? parseFloat(riskRatioEl.value) / 100 : 0.70;
+  const safeRatio   = 1 - riskRatio;
+
+  let stopAge = 55;
+  const stopGrp = document.getElementById('i-stop-group') || document.getElementById('i-age-group');
+  if (stopGrp) {
+    const activeBtn = stopGrp.querySelector('.age-btn.active');
+    if (activeBtn) stopAge = parseInt(activeBtn.dataset.stop) || 55;
+  }
+
+  const now = new Date();
+  const ageNow = now.getFullYear() - birthYear + (now.getMonth() + 1 >= birthMonth ? 0 : -1);
+  const years  = Math.max(1, stopAge - ageNow);
+
+  const yrEl = document.getElementById('i-years-display');
+  if (yrEl) yrEl.textContent = `납입 기간: ${years}년 (${ageNow}세 → ${stopAge}세)`;
+
+  const monthlyRate = rate / 12;
+  const n = years * 12;
+  const totalIn  = monthly * n;
+  const totalOut = monthly * ((Math.pow(1 + monthlyRate, n) - 1) / monthlyRate) * (1 + monthlyRate);
+  const profit   = totalOut - totalIn;
+  const tax      = Math.min(monthly * 12, 900) * taxRate * years;
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('i-total-in',  fmtWon(totalIn));
+  set('i-total-out', fmtWon(Math.round(totalOut)));
+  set('i-profit',    fmtWon(Math.round(profit)));
+  set('i-tax',       fmtWon(Math.round(tax)));
+
+  // 위험/안전 바
+  const barRisky = document.getElementById('i-bar-risky');
+  const barSafe  = document.getElementById('i-bar-safe');
+  if (barRisky) barRisky.style.width = (riskRatio * 100) + '%';
+  if (barSafe)  barSafe.style.width  = (safeRatio * 100) + '%';
+  const riskValEl = document.getElementById('i-risk-val');
+  const safeValEl = document.getElementById('i-safe-val');
+  if (riskValEl) riskValEl.textContent = Math.round(riskRatio * 100) + '%';
+  if (safeValEl) safeValEl.textContent = Math.round(safeRatio * 100) + '%';
+}
+
+/* ════════════════════════════════════════
+   ISA 계산
+════════════════════════════════════════ */
+function calcISA() {
+  const monthly  = parseFloat(document.getElementById('s-monthly')?.value) || 30;
+  const rateEl   = document.getElementById('s-rate');
+  const rate     = rateEl ? parseFloat(rateEl.value) / 100 : 0.05;
+  const typeEl   = document.getElementById('s-type');
+  const isaType  = typeEl ? typeEl.value : 'general'; // general | savings
+
+  // ISA 비과세 한도
+  const taxFreeLimit = isaType === 'savings' ? 400 : 200; // 만원
+
+  // ISA 만기 3년 고정
+  const years = 3;
+  const monthlyRate = rate / 12;
+  const n = years * 12;
+  const totalIn  = monthly * n;
+  const totalOut = monthly * ((Math.pow(1 + monthlyRate, n) - 1) / monthlyRate) * (1 + monthlyRate);
+  const profit   = totalOut - totalIn;
+  const taxableProfit = Math.max(0, profit - taxFreeLimit);
+  const tax      = taxableProfit * 0.099; // ISA 분리과세 9.9%
+  const netProfit = profit - tax;
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('s-total-in',       fmtWon(totalIn));
+  set('s-total-out',      fmtWon(Math.round(totalOut)));
+  set('s-profit',         fmtWon(Math.round(profit)));
+  set('s-tax',            fmtWon(Math.round(tax)));
+  set('s-tax-free-profit',fmtWon(Math.round(netProfit)));
+}
+
+/* ════════════════════════════════════════
+   통합 비교
+════════════════════════════════════════ */
+function calcCompare() {
+  // 기본 비교 계산 (입력값 재사용)
+  calcPension(); calcIRP(); calcISA();
+}
+
+</script>
 <style>
 /* ── 다크 모드 (기본) ── */
 :root {
@@ -1162,59 +1439,6 @@ footer{text-align:center;padding:28px 0 0;font-size:12px;color:var(--text3);bord
 .sc-type{font-size:10px;color:var(--text3);margin-top:8px}
 
 
-/* ══ 로그인 / 회원가입 화면 ══ */
-#auth-overlay{position:fixed;inset:0;z-index:9999;background:radial-gradient(ellipse at 60% 40%,rgba(61,142,240,0.12),transparent 60%),radial-gradient(ellipse at 30% 70%,rgba(240,168,50,0.08),transparent 60%),#0d1017;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.4s ease;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px 16px}
-#auth-overlay.hidden{display:none}
-[data-theme="light"] #auth-overlay{
-  background:radial-gradient(ellipse at 60% 40%, rgba(61,142,240,0.08), transparent 60%),
-             #f5f7fa;
-}
-#auth-overlay.hidden{display:none !important}
-.auth-box{
-  background:var(--bg2);border:1px solid var(--border);border-radius:24px;
-  padding:40px 40px 36px;width:100%;max-width:420px;
-  box-shadow:0 24px 80px rgba(0,0,0,0.5);
-  animation:slideUp 0.4s ease;
-  flex-shrink:0;
-}
-@media(max-width:480px){
-  .auth-box{padding:28px 20px 24px;border-radius:18px}
-  .auth-logo-icon{font-size:36px}
-  .auth-logo-title{font-size:18px}
-}
-@keyframes slideUp{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
-.auth-logo{text-align:center;margin-bottom:28px}
-.auth-logo-icon{font-size:44px;margin-bottom:8px}
-.auth-logo-title{font-size:22px;font-weight:800;background:linear-gradient(135deg,var(--pension),var(--isa));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
-.auth-logo-sub{font-size:12px;color:var(--text3)}
-.auth-tabs{display:flex;background:var(--bg3);border-radius:10px;padding:4px;margin-bottom:24px;gap:4px}
-.auth-tab{flex:1;padding:9px;font-size:14px;font-weight:600;border:none;border-radius:7px;cursor:pointer;background:transparent;color:var(--text3);transition:all 0.2s;font-family:var(--sans)}
-.auth-tab.active{background:var(--bg);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,0.3)}
-.auth-field{margin-bottom:14px}
-.auth-field label{display:block;font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:500}
-.auth-field input{
-  width:100%;background:var(--bg3);border:1px solid var(--border2);
-  border-radius:10px;padding:11px 14px;font-size:14px;color:var(--text);
-  outline:none;transition:border-color 0.2s;font-family:var(--sans);box-sizing:border-box;
-}
-.auth-field input:focus{border-color:rgba(61,142,240,0.5);box-shadow:0 0 0 3px rgba(61,142,240,0.08)}
-.auth-btn{
-  width:100%;padding:13px;background:linear-gradient(135deg,var(--pension),rgba(61,142,240,0.7));
-  border:none;border-radius:10px;color:#fff;font-size:15px;font-weight:700;
-  cursor:pointer;font-family:var(--sans);transition:all 0.2s;margin-top:6px;
-  box-shadow:0 4px 16px rgba(61,142,240,0.3);
-}
-.auth-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(61,142,240,0.4)}
-.auth-btn:active{transform:none}
-.auth-error{
-  background:rgba(232,85,85,0.1);border:1px solid rgba(232,85,85,0.3);
-  border-radius:8px;padding:9px 12px;font-size:13px;color:var(--red);
-  margin-bottom:14px;display:none;
-}
-.auth-divider{display:flex;align-items:center;gap:10px;margin:18px 0;color:var(--text3);font-size:12px}
-.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
-.auth-notice{font-size:11px;color:var(--text3);text-align:center;margin-top:16px;line-height:1.6}
-.auth-notice strong{color:var(--text2)}
 
 /* 로그아웃 버튼 (네비에 추가) */
 .nav-user-area{display:flex;align-items:center;gap:10px;margin-left:auto}
@@ -1242,6 +1466,25 @@ footer{text-align:center;padding:28px 0 0;font-size:12px;color:var(--text3);bord
   .etf-mobile-price{font-size:12px;color:var(--text2)}
   .etf-mobile-price strong{font-family:var(--mono);color:var(--text);font-size:13px}
   .etf-mobile-actions{display:flex;gap:6px}
+}
+@media(min-width:769px){
+  .etf-mobile-cards{display:none}
+}
+
+/* ── ETF 리스트 모바일 카드 ── */
+@media(max-width:768px){
+  .etf-list-table{display:none}
+  #etfl-no-result{display:none}
+  .etf-mobile-cards{display:grid;gap:10px}
+  .etf-mobile-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+  .etf-mobile-card.safe-row{background:rgba(61,142,240,0.03);border-color:rgba(61,142,240,0.2)}
+  .etf-mobile-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+  .etf-mobile-name{font-size:13px;font-weight:700;color:var(--text);flex:1;padding-right:8px;line-height:1.4}
+  .etf-mobile-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px}
+  .etf-mobile-code{font-family:var(--mono);font-size:11px;color:var(--irp);background:rgba(52,201,122,0.08);padding:2px 7px;border-radius:4px}
+  .etf-mobile-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border)}
+  .filter-btn{padding:8px 11px;font-size:12px}
+  .fetch-all-btn{font-size:12px;padding:7px 11px}
 }
 @media(min-width:769px){
   .etf-mobile-cards{display:none}
@@ -3756,9 +3999,7 @@ function doLogout() {
    ⚠ 실제 보안이 아닌 UI 잠금입니다
 ════════════════════════════════════════ */
 // initAuth는 아래 DOMContentLoaded에서 호출
-function initAuth() {
-  // 로그인 페이지 없음 - 바로 진입
-}
+function initAuth() { /* 로그인 없이 바로 진입 */ }
 
 
 
@@ -3787,6 +4028,7 @@ function restoreTheme() {
 document.addEventListener('DOMContentLoaded', function() {
   restoreTheme();
   initAuth();
+  showPage('planner');
 
   function on(id, ev, fn) {
     var el = document.getElementById(id);
@@ -4527,6 +4769,57 @@ function filterETFList() {
   document.getElementById('el-safe-count').textContent     = safeTotal + '종';
   document.getElementById('el-filtered-count').textContent = list.length + '종';
   document.getElementById('el-avg-div').textContent = divs.length ? (divs.reduce((a,b)=>a+b,0)/divs.length).toFixed(1)+'%' : '—';
+
+  // ── 모바일 카드 렌더링 ──
+  const mobileWrap = document.getElementById('etf-mobile-cards-wrap');
+  if (mobileWrap) {
+    if (list.length === 0) {
+      mobileWrap.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);font-size:14px">검색 결과가 없습니다</div>';
+    } else {
+      mobileWrap.innerHTML = list.map(e => {
+        const cached = priceCache[e.code];
+        const isSafe = e.risk === 'safe';
+        const riskBadge = isSafe
+          ? '<span class="risk-safe" style="font-size:10px">🛡 안전</span>'
+          : '<span class="risk-risky" style="font-size:10px">⚡ 위험</span>';
+        const catCls  = {us:'cat-us',kr:'cat-kr',div:'cat-div',bond:'cat-bond',global:'cat-global',theme:'cat-theme'}[e.cat] || '';
+        const catName = {us:'미국',kr:'국내',div:'배당',bond:'채권',global:'글로벌',theme:'테마'}[e.cat] || e.cat;
+        const freqColor = e.freq==='월' ? 'var(--isa)' : e.freq==='분기' ? 'var(--text2)' : 'var(--text3)';
+        const safeName = e.name.replace(/'/g,"\'");
+        let priceStr = '—', chgStr = '', chgCls = '';
+        if (cached && typeof cached === 'object') {
+          priceStr = cached.currency==='KRW'
+            ? Math.round(cached.price).toLocaleString('ko-KR')+'원'
+            : cached.price.toFixed(2);
+          const sign = cached.chg >= 0 ? '+' : '';
+          chgStr = sign + cached.chg.toFixed(2) + '%';
+          chgCls = cached.chg >= 0 ? 'color:var(--irp)' : 'color:var(--red)';
+        }
+        return `<div class="etf-mobile-card ${isSafe?'safe-row':''}">
+          <div class="etf-mobile-top">
+            <div style="flex:1">
+              <div class="etf-mobile-name">${e.name}</div>
+              <div class="etf-mobile-meta">
+                <span class="etf-mobile-code">${e.code}</span>
+                <span class="cat-badge ${catCls}" style="font-size:10px">${catName}</span>
+                ${riskBadge}
+              </div>
+              <div style="font-size:11px;color:var(--text3)">${e.index}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;margin-left:10px">
+              <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:${e.div>0?'var(--isa)':'var(--text3)'};line-height:1">${e.div>0?e.div.toFixed(1)+'%':'—'}</div>
+              <div style="font-size:10px;color:var(--text3)">연 배당수익률</div>
+              <div style="font-size:11px;color:${freqColor};margin-top:3px">${e.freq} 지급</div>
+            </div>
+          </div>
+          <div class="etf-mobile-bottom">
+            <div style="font-size:12px;color:var(--text3)">${e.mgmt} · ${priceStr!=='—'?`<strong style="font-family:var(--mono);color:var(--text)">${priceStr}</strong> <span style="${chgCls};font-size:11px">${chgStr}</span>`:`<button onclick="fetchSinglePrice('${e.code}')" style="padding:2px 8px;background:rgba(52,201,122,0.1);border:1px solid rgba(52,201,122,0.2);border-radius:4px;color:var(--irp);font-size:11px;cursor:pointer">시세 조회</button>`}</div>
+            <button class="etf-comp-btn" onclick="showCompModal('${e.code}','${safeName}')">🔍 구성종목</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
 }
 
 function calcIRPAlloc() {
