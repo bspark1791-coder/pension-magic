@@ -4658,62 +4658,6 @@ function filterETFList() {
   document.getElementById('el-filtered-count').textContent = list.length + '종';
   document.getElementById('el-avg-div').textContent = divs.length ? (divs.reduce((a,b)=>a+b,0)/divs.length).toFixed(1)+'%' : '—';
 
-  // ── 모바일 카드 렌더링 ──
-  const mobileWrap = document.getElementById('etf-mobile-cards-wrap');
-  if (mobileWrap) {
-    if (list.length === 0) {
-      mobileWrap.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);font-size:14px">검색 결과가 없습니다</div>';
-    } else {
-      mobileWrap.innerHTML = list.map(e => {
-        const cached = priceCache[e.code];
-        const isSafe = e.risk === 'safe';
-        const riskBadge = isSafe
-          ? '<span class="risk-safe" style="font-size:10px">🛡 안전</span>'
-          : '<span class="risk-risky" style="font-size:10px">⚡ 위험</span>';
-        const catCls  = {us:'cat-us',kr:'cat-kr',div:'cat-div',bond:'cat-bond',global:'cat-global',theme:'cat-theme'}[e.cat] || '';
-        const catName = {us:'미국',kr:'국내',div:'배당',bond:'채권',global:'글로벌',theme:'테마'}[e.cat] || e.cat;
-        const freqColor = e.freq==='월' ? 'var(--isa)' : e.freq==='분기' ? 'var(--text2)' : 'var(--text3)';
-        const safeName = e.name.replace(/'/g,"\'");
-        let priceStr = '—', chgStr = '', chgCls = '';
-        if (cached && typeof cached === 'object') {
-          priceStr = cached.currency==='KRW'
-            ? Math.round(cached.price).toLocaleString('ko-KR')+'원'
-            : cached.price.toFixed(2);
-          const sign = cached.chg >= 0 ? '+' : '';
-          chgStr = sign + cached.chg.toFixed(2) + '%';
-          chgCls = cached.chg >= 0 ? 'color:var(--irp)' : 'color:var(--red)';
-        }
-        return `<div class="etf-mobile-card ${isSafe?'safe-row':''}">
-          <div class="etf-mobile-top">
-            <div style="flex:1">
-              <div class="etf-mobile-name">${e.name}</div>
-              <div class="etf-mobile-meta">
-                <span class="etf-mobile-code">${e.code}</span>
-                <span class="cat-badge ${catCls}" style="font-size:10px">${catName}</span>
-                ${riskBadge}
-              </div>
-              <div style="font-size:11px;color:var(--text3)">${e.index}</div>
-            </div>
-            <div style="text-align:right;flex-shrink:0;margin-left:10px">
-              <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:${e.div>0?'var(--isa)':'var(--text3)'};line-height:1">${e.div>0?e.div.toFixed(1)+'%':'—'}</div>
-              <div style="font-size:10px;color:var(--text3)">연 배당수익률</div>
-              <div style="font-size:11px;color:${freqColor};margin-top:3px">${e.freq} 지급</div>
-            </div>
-          </div>
-          <div class="etf-mobile-bottom">
-            <div style="font-size:12px;color:var(--text3)">${e.mgmt} · ${priceStr!=='—'?`<strong style="font-family:var(--mono);color:var(--text)">${priceStr}</strong> <span style="${chgCls};font-size:11px">${chgStr}</span>`:`<button onclick="fetchSinglePrice('${e.code}')" style="padding:2px 8px;background:rgba(52,201,122,0.1);border:1px solid rgba(52,201,122,0.2);border-radius:4px;color:var(--irp);font-size:11px;cursor:pointer">시세 조회</button>`}</div>
-            <button class="etf-comp-btn" onclick="showCompModal('${e.code}','${safeName}')">🔍 구성종목</button>
-          </div>
-        </div>`;
-      }).join('');
-    }
-  }
-}
-
-function calcIRPAlloc() {
-  const safeCount = ETF_DB.filter(e => e.risk === 'safe').length;
-  const el = document.getElementById('ia-safe-count');
-  if (el) el.textContent = safeCount + '종';
 }
 </script>
 </body>
