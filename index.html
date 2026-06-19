@@ -37,283 +37,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script>
-/* ════════════════════════════════════════
-   유틸리티
-════════════════════════════════════════ */
-function fmtNum(n) {
-  if (n === undefined || n === null || isNaN(n)) return '—';
-  return Math.round(n).toLocaleString('ko-KR');
-}
-function fmtWon(n) { return fmtNum(n) + '만원'; }
 
-function applyCommaEl(id) {
-  // 숫자 입력창 포맷 (기존 oninput과 충돌 방지 — 값만 유지)
-}
-
-function syncRateSlider(prefix) {
-  const slider = document.getElementById(prefix + '-rate');
-  const input  = document.getElementById(prefix + '-rate-input');
-  const label  = document.getElementById(prefix + '-rate-val');
-  if (!slider) return;
-  const val = parseFloat(slider.value);
-  if (input) input.value = val;
-  if (label) label.textContent = val + '%';
-  if (prefix === 'p') calcPension();
-  if (prefix === 'i') calcIRP();
-  if (prefix === 's') calcISA();
-}
-
-function syncRateInput(prefix) {
-  const input  = document.getElementById(prefix + '-rate-input');
-  const slider = document.getElementById(prefix + '-rate');
-  const label  = document.getElementById(prefix + '-rate-val');
-  if (!input) return;
-  let val = parseFloat(input.value);
-  if (isNaN(val)) val = 5;
-  val = Math.min(20, Math.max(1, val));
-  if (slider) slider.value = val;
-  if (label) label.textContent = val + '%';
-  if (prefix === 'p') calcPension();
-  if (prefix === 'i') calcIRP();
-  if (prefix === 's') calcISA();
-}
-
-/* ════════════════════════════════════════
-   페이지 전환
-════════════════════════════════════════ */
-const PAGE_IDS = ['planner','portfolio','etflist','market','insight','etfrec','goalcalc'];
-
-const SUB_MAP = {
-  planner:  ['calculator','taxcal','compare'],
-  market:   ['dividend','etfdiv','events','stocks'],
-  insight:  ['about','news'],
-};
-
-function showPage(name) {
-  PAGE_IDS.forEach(id => {
-    const el = document.getElementById('page-' + id);
-    if (el) el.style.display = 'none';
-  });
-  const target = document.getElementById('page-' + name);
-  if (target) target.style.display = '';
-
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.page === name);
-  });
-
-  // 기본 서브탭 활성화
-  if (SUB_MAP[name]) showSubTab(name, SUB_MAP[name][0]);
-
-  if (name === 'etflist' && typeof filterETFList === 'function') filterETFList();
-  if (name === 'goalcalc' && typeof calcIRPAlloc === 'function') calcIRPAlloc();
-  window.scrollTo(0, 0);
-}
-
-function showSubTab(page, sub) {
-  const subs = SUB_MAP[page];
-  if (!subs) return;
-  subs.forEach(s => {
-    const el = document.getElementById(page + '-' + s);
-    if (el) el.style.display = (s === sub) ? '' : 'none';
-  });
-  document.querySelectorAll(`#page-${page} .msub-btn`).forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.sub === sub);
-  });
-  // 서브탭 진입 시 계산 실행
-  if (page === 'planner' && sub === 'calculator') { calcPension(); calcIRP(); calcISA(); }
-  if (page === 'market'  && sub === 'dividend' && typeof renderDividendCalendar === 'function') renderDividendCalendar();
-}
-
-/* ════════════════════════════════════════
-   계산기 탭 전환 (개인연금/IRP/ISA/통합)
-════════════════════════════════════════ */
-function switchTab(tab) {
-  ['pension','irp','isa','combined'].forEach(t => {
-    const el = document.getElementById('panel-' + t);
-    if (el) el.style.display = (t === tab) ? 'block' : 'none';
-  });
-  document.querySelectorAll('.tab[data-tab]').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.tab === tab);
-  });
-  if (tab === 'pension')  calcPension();
-  if (tab === 'irp')      calcIRP();
-  if (tab === 'isa')      calcISA();
-  if (tab === 'combined') calcCompare();
-}
-
-/* ════════════════════════════════════════
-   나이 설정
-════════════════════════════════════════ */
-function setStopAge(prefix, age) {
-  document.querySelectorAll(`.age-btn[data-stop]`).forEach(btn => {
-    if (btn.closest('#' + prefix + '-stop-group') || btn.closest('#' + (prefix==='p'?'panel-pension':'panel-irp'))) {
-      btn.classList.toggle('active', parseInt(btn.dataset.stop) === age);
-    }
-  });
-  // prefix별 그룹 버튼 active
-  const grp = document.getElementById(prefix + '-stop-group') || document.getElementById(prefix + '-age-group');
-  if (grp) {
-    grp.querySelectorAll('.age-btn').forEach(btn => {
-      btn.classList.toggle('active', parseInt(btn.dataset.stop) === age);
-    });
-  }
-  if (prefix === 'p') calcPension();
-  if (prefix === 'i') calcIRP();
-}
-
-function setAge(prefix, age) { setStopAge(prefix, age); }
-
-/* ════════════════════════════════════════
-   개인연금 계산
-════════════════════════════════════════ */
-function calcPension() {
-  const monthly   = parseFloat(document.getElementById('p-monthly')?.value) || 30;
-  const birthYear = parseInt(document.getElementById('p-birth-year')?.value)  || 1990;
-  const birthMonth= parseInt(document.getElementById('p-birth-month')?.value) || 1;
-  const rateEl    = document.getElementById('p-rate');
-  const rate      = rateEl ? parseFloat(rateEl.value) / 100 : 0.05;
-  const taxEl     = document.getElementById('p-taxrate');
-  const taxRate   = taxEl ? parseFloat(taxEl.value) / 100 : 0.033;
-
-  // 납입 종료 나이 (active 버튼)
-  let stopAge = 55;
-  const stopGrp = document.getElementById('p-stop-group') || document.getElementById('p-age-group');
-  if (stopGrp) {
-    const activeBtn = stopGrp.querySelector('.age-btn.active');
-    if (activeBtn) stopAge = parseInt(activeBtn.dataset.stop) || 55;
-  }
-
-  const now = new Date();
-  const ageNow = now.getFullYear() - birthYear + (now.getMonth() + 1 >= birthMonth ? 0 : -1);
-  const years  = Math.max(1, stopAge - ageNow);
-
-  // 납입 기간 표시
-  const yrEl = document.getElementById('p-years-display');
-  if (yrEl) yrEl.textContent = `납입 기간: ${years}년 (${ageNow}세 → ${stopAge}세)`;
-
-  // 복리 계산 (월 복리)
-  const monthlyRate = rate / 12;
-  const n = years * 12;
-  const totalIn  = monthly * n;  // 만원
-  const totalOut = monthly * ((Math.pow(1 + monthlyRate, n) - 1) / monthlyRate) * (1 + monthlyRate);
-  const profit   = totalOut - totalIn;
-  const tax      = totalIn * taxRate * years; // 연 세액공제
-
-  // 결과 업데이트
-  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  set('p-total-in',  fmtWon(totalIn));
-  set('p-total-out', fmtWon(Math.round(totalOut)));
-  set('p-profit',    fmtWon(Math.round(profit)));
-  set('p-tax',       fmtWon(Math.round(tax)));
-
-  // 타임라인
-  set('p-tl-pay',      years + '년');
-  set('p-tl-pay-sub',  fmtWon(totalIn));
-  set('p-stop-value',  fmtWon(Math.round(totalOut)));
-  set('p-total-out-val', fmtWon(Math.round(totalOut)));
-
-  // 세액공제 안내
-  const taxRefEl = document.getElementById('p-tax-refund-amt');
-  const annualTaxRefund = Math.min(monthly * 12, 600) * taxRate;
-  if (taxRefEl) taxRefEl.textContent = fmtWon(Math.round(annualTaxRefund)) + '/년';
-}
-
-/* ════════════════════════════════════════
-   IRP 계산
-════════════════════════════════════════ */
-function calcIRP() {
-  const monthly    = parseFloat(document.getElementById('i-monthly')?.value) || 30;
-  const birthYear  = parseInt(document.getElementById('i-birth-year')?.value)  || 1990;
-  const birthMonth = parseInt(document.getElementById('i-birth-month')?.value) || 1;
-  const rateEl     = document.getElementById('i-rate');
-  const rate       = rateEl ? parseFloat(rateEl.value) / 100 : 0.08;
-  const taxEl      = document.getElementById('i-taxrate');
-  const taxRate    = taxEl ? parseFloat(taxEl.value) / 100 : 0.033;
-
-  // 위험/안전 비율
-  const riskRatioEl = document.getElementById('i-risk-ratio');
-  const riskRatio   = riskRatioEl ? parseFloat(riskRatioEl.value) / 100 : 0.70;
-  const safeRatio   = 1 - riskRatio;
-
-  let stopAge = 55;
-  const stopGrp = document.getElementById('i-stop-group') || document.getElementById('i-age-group');
-  if (stopGrp) {
-    const activeBtn = stopGrp.querySelector('.age-btn.active');
-    if (activeBtn) stopAge = parseInt(activeBtn.dataset.stop) || 55;
-  }
-
-  const now = new Date();
-  const ageNow = now.getFullYear() - birthYear + (now.getMonth() + 1 >= birthMonth ? 0 : -1);
-  const years  = Math.max(1, stopAge - ageNow);
-
-  const yrEl = document.getElementById('i-years-display');
-  if (yrEl) yrEl.textContent = `납입 기간: ${years}년 (${ageNow}세 → ${stopAge}세)`;
-
-  const monthlyRate = rate / 12;
-  const n = years * 12;
-  const totalIn  = monthly * n;
-  const totalOut = monthly * ((Math.pow(1 + monthlyRate, n) - 1) / monthlyRate) * (1 + monthlyRate);
-  const profit   = totalOut - totalIn;
-  const tax      = Math.min(monthly * 12, 900) * taxRate * years;
-
-  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  set('i-total-in',  fmtWon(totalIn));
-  set('i-total-out', fmtWon(Math.round(totalOut)));
-  set('i-profit',    fmtWon(Math.round(profit)));
-  set('i-tax',       fmtWon(Math.round(tax)));
-
-  // 위험/안전 바
-  const barRisky = document.getElementById('i-bar-risky');
-  const barSafe  = document.getElementById('i-bar-safe');
-  if (barRisky) barRisky.style.width = (riskRatio * 100) + '%';
-  if (barSafe)  barSafe.style.width  = (safeRatio * 100) + '%';
-  const riskValEl = document.getElementById('i-risk-val');
-  const safeValEl = document.getElementById('i-safe-val');
-  if (riskValEl) riskValEl.textContent = Math.round(riskRatio * 100) + '%';
-  if (safeValEl) safeValEl.textContent = Math.round(safeRatio * 100) + '%';
-}
-
-/* ════════════════════════════════════════
-   ISA 계산
-════════════════════════════════════════ */
-function calcISA() {
-  const monthly  = parseFloat(document.getElementById('s-monthly')?.value) || 30;
-  const rateEl   = document.getElementById('s-rate');
-  const rate     = rateEl ? parseFloat(rateEl.value) / 100 : 0.05;
-  const typeEl   = document.getElementById('s-type');
-  const isaType  = typeEl ? typeEl.value : 'general'; // general | savings
-
-  // ISA 비과세 한도
-  const taxFreeLimit = isaType === 'savings' ? 400 : 200; // 만원
-
-  // ISA 만기 3년 고정
-  const years = 3;
-  const monthlyRate = rate / 12;
-  const n = years * 12;
-  const totalIn  = monthly * n;
-  const totalOut = monthly * ((Math.pow(1 + monthlyRate, n) - 1) / monthlyRate) * (1 + monthlyRate);
-  const profit   = totalOut - totalIn;
-  const taxableProfit = Math.max(0, profit - taxFreeLimit);
-  const tax      = taxableProfit * 0.099; // ISA 분리과세 9.9%
-  const netProfit = profit - tax;
-
-  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  set('s-total-in',       fmtWon(totalIn));
-  set('s-total-out',      fmtWon(Math.round(totalOut)));
-  set('s-profit',         fmtWon(Math.round(profit)));
-  set('s-tax',            fmtWon(Math.round(tax)));
-  set('s-tax-free-profit',fmtWon(Math.round(netProfit)));
-}
-
-/* ════════════════════════════════════════
-   통합 비교
-════════════════════════════════════════ */
-function calcCompare() {
-  // 기본 비교 계산 (입력값 재사용)
-  calcPension(); calcIRP(); calcISA();
-}
-</script>
 <style>
 /* ── 다크 모드 (기본) ── */
 :root {
@@ -3721,133 +3445,287 @@ Coca-Cola	=GOOGLEFINANCE("NYSE:KO","price")	=GOOGLEFINANCE("NYSE:KO","changepct"
 <div id="chat-overlay" onclick="toggleChat()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:499"></div>
 
 <script>
+/* ════════════════════════════════════════
+   유틸리티
+════════════════════════════════════════ */
+function fmtNum(n) {
+  if (n === undefined || n === null || isNaN(n)) return '—';
+  return Math.round(n).toLocaleString('ko-KR');
+}
+function fmtWon(n) { return fmtNum(n) + '만원'; }
+
+function applyCommaEl(id) {
+  // 숫자 입력창 포맷 (기존 oninput과 충돌 방지 — 값만 유지)
+}
+
+function syncRateSlider(prefix) {
+  const slider = document.getElementById(prefix + '-rate');
+  const input  = document.getElementById(prefix + '-rate-input');
+  const label  = document.getElementById(prefix + '-rate-val');
+  if (!slider) return;
+  const val = parseFloat(slider.value);
+  if (input) input.value = val;
+  if (label) label.textContent = val + '%';
+  if (prefix === 'p') calcPension();
+  if (prefix === 'i') calcIRP();
+  if (prefix === 's') calcISA();
+}
+
+function syncRateInput(prefix) {
+  const input  = document.getElementById(prefix + '-rate-input');
+  const slider = document.getElementById(prefix + '-rate');
+  const label  = document.getElementById(prefix + '-rate-val');
+  if (!input) return;
+  let val = parseFloat(input.value);
+  if (isNaN(val)) val = 5;
+  val = Math.min(20, Math.max(1, val));
+  if (slider) slider.value = val;
+  if (label) label.textContent = val + '%';
+  if (prefix === 'p') calcPension();
+  if (prefix === 'i') calcIRP();
+  if (prefix === 's') calcISA();
+}
+
+/* ════════════════════════════════════════
+   페이지 전환
+════════════════════════════════════════ */
+const PAGE_IDS = ['planner','portfolio','etflist','market','insight','etfrec','goalcalc'];
+
+const SUB_MAP = {
+  planner:  ['calculator','taxcal','compare'],
+  market:   ['dividend','etfdiv','events','stocks'],
+  insight:  ['about','news'],
+};
+
+function showPage(name) {
+  PAGE_IDS.forEach(id => {
+    const el = document.getElementById('page-' + id);
+    if (el) el.style.display = 'none';
+  });
+  const target = document.getElementById('page-' + name);
+  if (target) target.style.display = '';
+
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.page === name);
+  });
+
+  // 기본 서브탭 활성화
+  if (SUB_MAP[name]) showSubTab(name, SUB_MAP[name][0]);
+
+  if (name === 'etflist' && typeof filterETFList === 'function') filterETFList();
+  if (name === 'goalcalc' && typeof calcIRPAlloc === 'function') calcIRPAlloc();
+  window.scrollTo(0, 0);
+}
+
+function showSubTab(page, sub) {
+  const subs = SUB_MAP[page];
+  if (!subs) return;
+  subs.forEach(s => {
+    const el = document.getElementById(page + '-' + s);
+    if (el) el.style.display = (s === sub) ? '' : 'none';
+  });
+  document.querySelectorAll(`#page-${page} .msub-btn`).forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.sub === sub);
+  });
+  // 서브탭 진입 시 계산 실행
+  if (page === 'planner' && sub === 'calculator') { calcPension(); calcIRP(); calcISA(); }
+  if (page === 'market'  && sub === 'dividend' && typeof renderDividendCalendar === 'function') renderDividendCalendar();
+}
+
+/* ════════════════════════════════════════
+   계산기 탭 전환 (개인연금/IRP/ISA/통합)
+════════════════════════════════════════ */
+function switchTab(tab) {
+  ['pension','irp','isa','combined'].forEach(t => {
+    const el = document.getElementById('panel-' + t);
+    if (el) el.style.display = (t === tab) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab[data-tab]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tab);
+  });
+  if (tab === 'pension')  calcPension();
+  if (tab === 'irp')      calcIRP();
+  if (tab === 'isa')      calcISA();
+  if (tab === 'combined') calcCompare();
+}
+
+/* ════════════════════════════════════════
+   나이 설정
+════════════════════════════════════════ */
+function setStopAge(prefix, age) {
+  document.querySelectorAll(`.age-btn[data-stop]`).forEach(btn => {
+    if (btn.closest('#' + prefix + '-stop-group') || btn.closest('#' + (prefix==='p'?'panel-pension':'panel-irp'))) {
+      btn.classList.toggle('active', parseInt(btn.dataset.stop) === age);
+    }
+  });
+  // prefix별 그룹 버튼 active
+  const grp = document.getElementById(prefix + '-stop-group') || document.getElementById(prefix + '-age-group');
+  if (grp) {
+    grp.querySelectorAll('.age-btn').forEach(btn => {
+      btn.classList.toggle('active', parseInt(btn.dataset.stop) === age);
+    });
+  }
+  if (prefix === 'p') calcPension();
+  if (prefix === 'i') calcIRP();
+}
+
+function setAge(prefix, age) { setStopAge(prefix, age); }
+
+/* ════════════════════════════════════════
+   개인연금 계산
+════════════════════════════════════════ */
+function calcPension() {
+  const monthly   = parseFloat(document.getElementById('p-monthly')?.value) || 30;
+  const birthYear = parseInt(document.getElementById('p-birth-year')?.value)  || 1990;
+  const birthMonth= parseInt(document.getElementById('p-birth-month')?.value) || 1;
+  const rateEl    = document.getElementById('p-rate');
+  const rate      = rateEl ? parseFloat(rateEl.value) / 100 : 0.05;
+  const taxEl     = document.getElementById('p-taxrate');
+  const taxRate   = taxEl ? parseFloat(taxEl.value) / 100 : 0.033;
+
+  // 납입 종료 나이 (active 버튼)
+  let stopAge = 55;
+  const stopGrp = document.getElementById('p-stop-group') || document.getElementById('p-age-group');
+  if (stopGrp) {
+    const activeBtn = stopGrp.querySelector('.age-btn.active');
+    if (activeBtn) stopAge = parseInt(activeBtn.dataset.stop) || 55;
+  }
+
+  const now = new Date();
+  const ageNow = now.getFullYear() - birthYear + (now.getMonth() + 1 >= birthMonth ? 0 : -1);
+  const years  = Math.max(1, stopAge - ageNow);
+
+  // 납입 기간 표시
+  const yrEl = document.getElementById('p-years-display');
+  if (yrEl) yrEl.textContent = `납입 기간: ${years}년 (${ageNow}세 → ${stopAge}세)`;
+
+  // 복리 계산 (월 복리)
+  const monthlyRate = rate / 12;
+  const n = years * 12;
+  const totalIn  = monthly * n;  // 만원
+  const totalOut = monthly * ((Math.pow(1 + monthlyRate, n) - 1) / monthlyRate) * (1 + monthlyRate);
+  const profit   = totalOut - totalIn;
+  const tax      = totalIn * taxRate * years; // 연 세액공제
+
+  // 결과 업데이트
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('p-total-in',  fmtWon(totalIn));
+  set('p-total-out', fmtWon(Math.round(totalOut)));
+  set('p-profit',    fmtWon(Math.round(profit)));
+  set('p-tax',       fmtWon(Math.round(tax)));
+
+  // 타임라인
+  set('p-tl-pay',      years + '년');
+  set('p-tl-pay-sub',  fmtWon(totalIn));
+  set('p-stop-value',  fmtWon(Math.round(totalOut)));
+  set('p-total-out-val', fmtWon(Math.round(totalOut)));
+
+  // 세액공제 안내
+  const taxRefEl = document.getElementById('p-tax-refund-amt');
+  const annualTaxRefund = Math.min(monthly * 12, 600) * taxRate;
+  if (taxRefEl) taxRefEl.textContent = fmtWon(Math.round(annualTaxRefund)) + '/년';
+}
+
+/* ════════════════════════════════════════
+   IRP 계산
+════════════════════════════════════════ */
+function calcIRP() {
+  const monthly    = parseFloat(document.getElementById('i-monthly')?.value) || 30;
+  const birthYear  = parseInt(document.getElementById('i-birth-year')?.value)  || 1990;
+  const birthMonth = parseInt(document.getElementById('i-birth-month')?.value) || 1;
+  const rateEl     = document.getElementById('i-rate');
+  const rate       = rateEl ? parseFloat(rateEl.value) / 100 : 0.08;
+  const taxEl      = document.getElementById('i-taxrate');
+  const taxRate    = taxEl ? parseFloat(taxEl.value) / 100 : 0.033;
+
+  // 위험/안전 비율
+  const riskRatioEl = document.getElementById('i-risk-ratio');
+  const riskRatio   = riskRatioEl ? parseFloat(riskRatioEl.value) / 100 : 0.70;
+  const safeRatio   = 1 - riskRatio;
+
+  let stopAge = 55;
+  const stopGrp = document.getElementById('i-stop-group') || document.getElementById('i-age-group');
+  if (stopGrp) {
+    const activeBtn = stopGrp.querySelector('.age-btn.active');
+    if (activeBtn) stopAge = parseInt(activeBtn.dataset.stop) || 55;
+  }
+
+  const now = new Date();
+  const ageNow = now.getFullYear() - birthYear + (now.getMonth() + 1 >= birthMonth ? 0 : -1);
+  const years  = Math.max(1, stopAge - ageNow);
+
+  const yrEl = document.getElementById('i-years-display');
+  if (yrEl) yrEl.textContent = `납입 기간: ${years}년 (${ageNow}세 → ${stopAge}세)`;
+
+  const monthlyRate = rate / 12;
+  const n = years * 12;
+  const totalIn  = monthly * n;
+  const totalOut = monthly * ((Math.pow(1 + monthlyRate, n) - 1) / monthlyRate) * (1 + monthlyRate);
+  const profit   = totalOut - totalIn;
+  const tax      = Math.min(monthly * 12, 900) * taxRate * years;
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('i-total-in',  fmtWon(totalIn));
+  set('i-total-out', fmtWon(Math.round(totalOut)));
+  set('i-profit',    fmtWon(Math.round(profit)));
+  set('i-tax',       fmtWon(Math.round(tax)));
+
+  // 위험/안전 바
+  const barRisky = document.getElementById('i-bar-risky');
+  const barSafe  = document.getElementById('i-bar-safe');
+  if (barRisky) barRisky.style.width = (riskRatio * 100) + '%';
+  if (barSafe)  barSafe.style.width  = (safeRatio * 100) + '%';
+  const riskValEl = document.getElementById('i-risk-val');
+  const safeValEl = document.getElementById('i-safe-val');
+  if (riskValEl) riskValEl.textContent = Math.round(riskRatio * 100) + '%';
+  if (safeValEl) safeValEl.textContent = Math.round(safeRatio * 100) + '%';
+}
+
+/* ════════════════════════════════════════
+   ISA 계산
+════════════════════════════════════════ */
+function calcISA() {
+  const monthly  = parseFloat(document.getElementById('s-monthly')?.value) || 30;
+  const rateEl   = document.getElementById('s-rate');
+  const rate     = rateEl ? parseFloat(rateEl.value) / 100 : 0.05;
+  const typeEl   = document.getElementById('s-type');
+  const isaType  = typeEl ? typeEl.value : 'general'; // general | savings
+
+  // ISA 비과세 한도
+  const taxFreeLimit = isaType === 'savings' ? 400 : 200; // 만원
+
+  // ISA 만기 3년 고정
+  const years = 3;
+  const monthlyRate = rate / 12;
+  const n = years * 12;
+  const totalIn  = monthly * n;
+  const totalOut = monthly * ((Math.pow(1 + monthlyRate, n) - 1) / monthlyRate) * (1 + monthlyRate);
+  const profit   = totalOut - totalIn;
+  const taxableProfit = Math.max(0, profit - taxFreeLimit);
+  const tax      = taxableProfit * 0.099; // ISA 분리과세 9.9%
+  const netProfit = profit - tax;
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('s-total-in',       fmtWon(totalIn));
+  set('s-total-out',      fmtWon(Math.round(totalOut)));
+  set('s-profit',         fmtWon(Math.round(profit)));
+  set('s-tax',            fmtWon(Math.round(tax)));
+  set('s-tax-free-profit',fmtWon(Math.round(netProfit)));
+}
+
+/* ════════════════════════════════════════
+   통합 비교
+════════════════════════════════════════ */
+function calcCompare() {
+  // 기본 비교 계산 (입력값 재사용)
+  calcPension(); calcIRP(); calcISA();
+}
+</script>
+<script>
 
 /* ═══════════════════════════════════════
    ETF 구성종목 데이터
 ═══════════════════════════════════════ */
-const ETF_COMPOSITION = {
-  '379800': { name:'TIGER 미국S&P500', desc:'S&P500 지수 추종 — 미국 대형주 500종목 분산', holdings:[
-    {name:'Apple', pct:7.1},{name:'Microsoft', pct:6.5},{name:'NVIDIA', pct:6.3},{name:'Amazon', pct:3.8},{name:'Meta Platforms', pct:2.6},{name:'Alphabet (A+C)', pct:4.1},{name:'Berkshire Hathaway', pct:1.8},{name:'Broadcom', pct:1.8},{name:'Tesla', pct:1.7},{name:'JPMorgan Chase', pct:1.5},{name:'나머지 490종목', pct:62.8}]},
-  '133690': { name:'TIGER 미국나스닥100', desc:'NASDAQ-100 지수 추종 — 미국 기술주 100종목', holdings:[
-    {name:'Apple', pct:9.0},{name:'Microsoft', pct:8.0},{name:'NVIDIA', pct:7.8},{name:'Amazon', pct:5.1},{name:'Meta Platforms', pct:4.5},{name:'Alphabet (GOOGL)', pct:2.6},{name:'Alphabet (GOOG)', pct:2.5},{name:'Tesla', pct:3.2},{name:'Broadcom', pct:3.0},{name:'Costco', pct:2.3},{name:'나머지 90종목', pct:52.0}]},
-  '360750': { name:'TIGER 미국S&P500TR', desc:'S&P500 TR — 배당금 자동 재투자 (세금 없이 복리)', holdings:[
-    {name:'Apple', pct:7.1},{name:'Microsoft', pct:6.5},{name:'NVIDIA', pct:6.3},{name:'Amazon', pct:3.8},{name:'Meta Platforms', pct:2.6},{name:'Alphabet A+C', pct:4.1},{name:'Berkshire Hathaway', pct:1.8},{name:'Broadcom', pct:1.8},{name:'Tesla', pct:1.7},{name:'JPMorgan Chase', pct:1.5},{name:'나머지 490종목', pct:62.8}]},
-  '448290': { name:'KODEX 미국S&P500TR', desc:'S&P500 TR — 배당 재투자형, 삼성자산운용', holdings:[
-    {name:'Apple', pct:7.1},{name:'Microsoft', pct:6.5},{name:'NVIDIA', pct:6.3},{name:'Amazon', pct:3.8},{name:'Meta Platforms', pct:2.6},{name:'Alphabet', pct:4.1},{name:'Berkshire Hathaway', pct:1.8},{name:'Broadcom', pct:1.8},{name:'Tesla', pct:1.7},{name:'JPMorgan Chase', pct:1.5},{name:'나머지 490종목', pct:62.8}]},
-  '278540': { name:'KODEX 미국S&P500', desc:'S&P500 지수 추종, 삼성자산운용', holdings:[
-    {name:'Apple', pct:7.1},{name:'Microsoft', pct:6.5},{name:'NVIDIA', pct:6.3},{name:'Amazon', pct:3.8},{name:'Meta Platforms', pct:2.6},{name:'Alphabet A+C', pct:4.1},{name:'Berkshire Hathaway', pct:1.8},{name:'Broadcom', pct:1.8},{name:'Tesla', pct:1.7},{name:'나머지 491종목', pct:64.3}]},
-  '486290': { name:'ACE 미국S&P500', desc:'S&P500 지수 추종, 한국투자신탁운용', holdings:[
-    {name:'Apple', pct:7.1},{name:'Microsoft', pct:6.5},{name:'NVIDIA', pct:6.3},{name:'Amazon', pct:3.8},{name:'Meta Platforms', pct:2.6},{name:'Alphabet', pct:4.1},{name:'Berkshire Hathaway', pct:1.8},{name:'Broadcom', pct:1.8},{name:'Tesla', pct:1.7},{name:'나머지 491종목', pct:64.3}]},
-  '459580': { name:'SOL 미국S&P500', desc:'S&P500 지수 추종, 신한자산운용', holdings:[
-    {name:'Apple', pct:7.1},{name:'Microsoft', pct:6.5},{name:'NVIDIA', pct:6.3},{name:'Amazon', pct:3.8},{name:'Meta Platforms', pct:2.6},{name:'Alphabet', pct:4.1},{name:'Berkshire Hathaway', pct:1.8},{name:'Broadcom', pct:1.8},{name:'Tesla', pct:1.7},{name:'나머지 491종목', pct:64.3}]},
-  '381170': { name:'KODEX 미국나스닥100TR', desc:'NASDAQ-100 TR — 배당 재투자형', holdings:[
-    {name:'Apple', pct:9.0},{name:'Microsoft', pct:8.0},{name:'NVIDIA', pct:7.8},{name:'Amazon', pct:5.1},{name:'Meta Platforms', pct:4.5},{name:'Alphabet', pct:5.1},{name:'Tesla', pct:3.2},{name:'Broadcom', pct:3.0},{name:'Costco', pct:2.3},{name:'나머지 91종목', pct:52.0}]},
-  '367380': { name:'KINDEX 미국나스닥100', desc:'NASDAQ-100 추종, 한국투자신탁운용', holdings:[
-    {name:'Apple', pct:9.0},{name:'Microsoft', pct:8.0},{name:'NVIDIA', pct:7.8},{name:'Amazon', pct:5.1},{name:'Meta Platforms', pct:4.5},{name:'Alphabet', pct:5.1},{name:'Tesla', pct:3.2},{name:'Broadcom', pct:3.0},{name:'Costco', pct:2.3},{name:'나머지 91종목', pct:52.0}]},
-  '211900': { name:'KODEX 미국FANG플러스(H)', desc:'NYSE FANG+ 10종목 집중, 환헤지', holdings:[
-    {name:'META (Facebook)', pct:11.0},{name:'Apple', pct:10.5},{name:'Amazon', pct:10.5},{name:'Netflix', pct:10.0},{name:'Alphabet (Google)', pct:10.0},{name:'Microsoft', pct:10.0},{name:'NVIDIA', pct:10.0},{name:'Snowflake', pct:9.5},{name:'Tesla', pct:9.0},{name:'Spotify', pct:9.5}]},
-  '438330': { name:'TIGER 미국테크TOP10', desc:'Indxx US Tech Top10 — 미국 기술 대장주 10선', holdings:[
-    {name:'NVIDIA', pct:18.5},{name:'Apple', pct:15.0},{name:'Microsoft', pct:14.0},{name:'Meta Platforms', pct:10.5},{name:'Broadcom', pct:9.0},{name:'Alphabet', pct:8.5},{name:'Amazon', pct:8.0},{name:'TSMC (ADR)', pct:6.5},{name:'Tesla', pct:5.5},{name:'ASML', pct:4.5}]},
-  '489040': { name:'KODEX 미국빅테크7+', desc:'빅테크 7종목 + 알파 편입, 삼성자산', holdings:[
-    {name:'NVIDIA', pct:20.0},{name:'Apple', pct:17.0},{name:'Microsoft', pct:15.0},{name:'Meta Platforms', pct:13.0},{name:'Alphabet', pct:12.0},{name:'Amazon', pct:11.0},{name:'Tesla', pct:8.0},{name:'Broadcom', pct:4.0}]},
-  '069500': { name:'KODEX 200', desc:'코스피200 지수 추종 — 국내 대형주 200종목', holdings:[
-    {name:'삼성전자', pct:26.5},{name:'SK하이닉스', pct:8.2},{name:'LG에너지솔루션', pct:3.5},{name:'삼성바이오로직스', pct:3.0},{name:'현대차', pct:2.8},{name:'셀트리온', pct:2.4},{name:'NAVER', pct:2.1},{name:'기아', pct:2.0},{name:'KB금융', pct:1.9},{name:'삼성SDI', pct:1.8},{name:'나머지 190종목', pct:45.8}]},
-  '102110': { name:'TIGER 200', desc:'코스피200 추종, 미래에셋자산운용', holdings:[
-    {name:'삼성전자', pct:26.5},{name:'SK하이닉스', pct:8.2},{name:'LG에너지솔루션', pct:3.5},{name:'삼성바이오로직스', pct:3.0},{name:'현대차', pct:2.8},{name:'셀트리온', pct:2.4},{name:'NAVER', pct:2.1},{name:'기아', pct:2.0},{name:'KB금융', pct:1.9},{name:'삼성SDI', pct:1.8},{name:'나머지 190종목', pct:45.8}]},
-  '148020': { name:'KBSTAR 200', desc:'코스피200 추종, KB자산운용', holdings:[
-    {name:'삼성전자', pct:26.5},{name:'SK하이닉스', pct:8.2},{name:'LG에너지솔루션', pct:3.5},{name:'삼성바이오로직스', pct:3.0},{name:'현대차', pct:2.8},{name:'나머지 195종목', pct:56.0}]},
-  '229200': { name:'KODEX 코스닥150', desc:'코스닥150 지수 추종 — 코스닥 우량주 150종목', holdings:[
-    {name:'에코프로비엠', pct:6.5},{name:'셀트리온헬스케어', pct:5.2},{name:'알테오젠', pct:4.8},{name:'HLB', pct:4.2},{name:'에코프로', pct:3.8},{name:'리가켐바이오', pct:3.0},{name:'포스코DX', pct:2.8},{name:'클래시스', pct:2.5},{name:'에스티팜', pct:2.2},{name:'나머지 141종목', pct:65.0}]},
-  '091160': { name:'KODEX 반도체', desc:'KRX 반도체 지수 — 국내 반도체 관련주', holdings:[
-    {name:'삼성전자', pct:38.0},{name:'SK하이닉스', pct:32.0},{name:'삼성SDI', pct:6.5},{name:'SK스퀘어', pct:5.0},{name:'한미반도체', pct:4.5},{name:'하나마이크론', pct:3.0},{name:'두산테스나', pct:2.5},{name:'솔브레인', pct:2.0},{name:'이오테크닉스', pct:2.0},{name:'나머지 종목', pct:4.5}]},
-  '453810': { name:'KODEX K-방산', desc:'국내 방위산업 핵심 종목 집중 편입', holdings:[
-    {name:'한화에어로스페이스', pct:28.0},{name:'LIG넥스원', pct:22.0},{name:'현대로템', pct:18.0},{name:'한국항공우주(KAI)', pct:15.0},{name:'SNT다이나믹스', pct:8.0},{name:'빅텍', pct:4.5},{name:'나머지 방산주', pct:4.5}]},
-  '411060': { name:'ACE 미국고배당S&P500', desc:'S&P500 고배당 80종목 — 배당률 상위 편입', holdings:[
-    {name:'AT&T', pct:4.2},{name:'Altria Group', pct:3.9},{name:'Verizon', pct:3.8},{name:'Pfizer', pct:3.5},{name:'IBM', pct:3.3},{name:'Chevron', pct:3.1},{name:'ExxonMobil', pct:3.0},{name:'KeyCorp', pct:2.8},{name:'Kinder Morgan', pct:2.7},{name:'나머지 71종목', pct:69.7}]},
-  '458730': { name:'TIGER 미국배당+3%프리미엄다우존스', desc:'다우존스 배당주 + 커버드콜 전략', holdings:[
-    {name:'Coca-Cola', pct:6.5},{name:'Verizon', pct:6.2},{name:'IBM', pct:5.8},{name:'Chevron', pct:5.5},{name:'Johnson & Johnson', pct:5.2},{name:'Merck', pct:4.8},{name:'Procter & Gamble', pct:4.5},{name:'Amgen', pct:4.2},{name:'3M', pct:4.0},{name:"McDonald's", pct:3.8},{name:'나머지 20종목', pct:49.5}]},
-  '455890': { name:'KODEX 미국배당커버드콜액티브', desc:'S&P500 배당주 + 커버드콜 액티브 운용', holdings:[
-    {name:'AT&T', pct:5.5},{name:'Verizon', pct:5.2},{name:'Altria', pct:4.8},{name:'Pfizer', pct:4.5},{name:'Chevron', pct:4.2},{name:'ExxonMobil', pct:4.0},{name:'IBM', pct:3.8},{name:'Realty Income', pct:3.5},{name:'나머지 종목', pct:64.5}]},
-  '462980': { name:'TIGER 미국나스닥100커버드콜', desc:'NASDAQ-100 + 커버드콜 — 월배당 극대화', holdings:[
-    {name:'Apple (보유+콜매도)', pct:9.0},{name:'Microsoft', pct:8.0},{name:'NVIDIA', pct:7.8},{name:'Amazon', pct:5.1},{name:'Meta', pct:4.5},{name:'Alphabet', pct:5.1},{name:'Tesla', pct:3.2},{name:'Broadcom', pct:3.0},{name:'나머지 91종목', pct:54.3}]},
-  '480040': { name:'SOL 미국배당다우존스', desc:'Dow Jones US Dividend 100 — 배당성장 100종목', holdings:[
-    {name:'Home Depot', pct:3.8},{name:'Amgen', pct:3.5},{name:'Broadcom', pct:3.3},{name:'Texas Instruments', pct:3.1},{name:'BlackRock', pct:3.0},{name:'Lockheed Martin', pct:2.8},{name:'Caterpillar', pct:2.7},{name:'Deere & Company', pct:2.5},{name:'나머지 92종목', pct:75.3}]},
-  '473640': { name:'RISE 미국배당다우존스', desc:'Dow Jones US Dividend 100, KB자산운용', holdings:[
-    {name:'Home Depot', pct:3.8},{name:'Amgen', pct:3.5},{name:'Broadcom', pct:3.3},{name:'Texas Instruments', pct:3.1},{name:'BlackRock', pct:3.0},{name:'Lockheed Martin', pct:2.8},{name:'나머지 94종목', pct:80.5}]},
-  '480640': { name:'ACE 미국배당다우존스액티브', desc:'Dow Jones 배당 액티브 — 한국투자신탁', holdings:[
-    {name:'Home Depot', pct:4.0},{name:'Amgen', pct:3.8},{name:'Broadcom', pct:3.5},{name:'Texas Instruments', pct:3.2},{name:'BlackRock', pct:3.1},{name:'Lockheed Martin', pct:2.9},{name:'나머지 94종목', pct:79.5}]},
-  '438900': { name:'TIGER 리츠부동산인프라', desc:'국내 상장 리츠 + 인프라 종목', holdings:[
-    {name:'맥쿼리인프라', pct:22.0},{name:'SK리츠', pct:12.0},{name:'롯데리츠', pct:10.5},{name:'코람코에너지리츠', pct:9.5},{name:'제이알글로벌리츠', pct:8.5},{name:'신한알파리츠', pct:7.5},{name:'ESR켄달스퀘어', pct:7.0},{name:'NH프라임리츠', pct:6.5},{name:'나머지 리츠', pct:16.5}]},
-  '352560': { name:'TIGER 미국MSCI리츠(H)', desc:'MSCI US REIT — 미국 상장 리츠 분산, 환헤지', holdings:[
-    {name:'Prologis', pct:9.5},{name:'American Tower', pct:8.8},{name:'Equinix', pct:7.5},{name:'Crown Castle', pct:5.8},{name:'Public Storage', pct:5.2},{name:'Realty Income', pct:4.8},{name:'Digital Realty', pct:4.5},{name:'SBA Communications', pct:4.0},{name:'나머지 리츠', pct:49.9}]},
-  '385560': { name:'TIGER 미국채10년선물', desc:'미국 10년 국채 선물 — 안전자산 대표', holdings:[
-    {name:'미국 10년 국채 선물', pct:99.0},{name:'현금·기타', pct:1.0}]},
-  '453850': { name:'ACE 미국30년국채액티브(H)', desc:'미국 30년 국채 직접 편입, 환헤지', holdings:[
-    {name:'US Treasury 30Y (2052)', pct:28.0},{name:'US Treasury 30Y (2053)', pct:25.0},{name:'US Treasury 30Y (2051)', pct:22.0},{name:'US Treasury 30Y (2050)', pct:20.0},{name:'현금·기타', pct:5.0}]},
-  '272580': { name:'KODEX 국채선물10년', desc:'국내 10년 국채 선물 — 국내 안전자산', holdings:[
-    {name:'국채 10년 선물 (KTB)', pct:99.0},{name:'현금·기타', pct:1.0}]},
-  '451340': { name:'TIGER 단기채권액티브', desc:'국내 단기채권 액티브 — IRP 안전자산 대표', holdings:[
-    {name:'국고채 1~3년', pct:35.0},{name:'통안채', pct:25.0},{name:'회사채 AA 이상', pct:20.0},{name:'금융채', pct:15.0},{name:'현금·기타', pct:5.0}]},
-  '130680': { name:'TIGER 국채3년', desc:'국내 3년 국채 추종 — 단기 안전자산', holdings:[
-    {name:'국고채 3년 (현물)', pct:85.0},{name:'국고채 2년', pct:10.0},{name:'현금·기타', pct:5.0}]},
-  '453870': { name:'SOL 미국채30년액티브(H)', desc:'미국 30년 국채 직접 편입, 신한', holdings:[
-    {name:'US Treasury 30Y (2052)', pct:30.0},{name:'US Treasury 30Y (2053)', pct:28.0},{name:'US Treasury 30Y (2051)', pct:25.0},{name:'US Treasury 30Y (2049)', pct:12.0},{name:'현금·기타', pct:5.0}]},
-  '195930': { name:'TIGER 해외주식MSCI World(H)', desc:'MSCI World — 선진국 23개국 분산, 환헤지', holdings:[
-    {name:'미국 (S&P500 등)', pct:68.5},{name:'일본', pct:6.2},{name:'영국', pct:3.8},{name:'캐나다', pct:3.5},{name:'프랑스', pct:3.2},{name:'스위스', pct:2.8},{name:'독일', pct:2.5},{name:'호주', pct:2.2},{name:'기타 선진국', pct:7.3}]},
-  '213630': { name:'TIGER 차이나CSI300', desc:'중국 CSI300 — 상해·심천 대형주 300종목', holdings:[
-    {name:'귀주모태주', pct:5.8},{name:'CATL (닝더스다이)', pct:5.2},{name:'중국공상은행', pct:3.8},{name:'중국건설은행', pct:3.2},{name:'평안보험', pct:3.0},{name:'비야디(BYD)', pct:2.8},{name:'나머지 294종목', pct:76.2}]},
-  '437080': { name:'TIGER 일본니케이225', desc:'Nikkei 225 — 일본 대표 225종목', holdings:[
-    {name:'도요타', pct:8.5},{name:'소프트뱅크', pct:6.2},{name:'소니', pct:5.8},{name:'키엔스', pct:5.2},{name:'패스트리테일링(유니클로)', pct:4.8},{name:'도쿄일렉트론', pct:4.5},{name:'미쓰비시UFJ', pct:4.0},{name:'나머지 218종목', pct:61.0}]},
-  '381180': { name:'KODEX 인도Nifty50', desc:'인도 NIFTY50 — 인도 대형주 50종목', holdings:[
-    {name:'릴라이언스 인더스트리', pct:10.5},{name:'HDFC Bank', pct:9.8},{name:'인포시스', pct:7.2},{name:'ICICI Bank', pct:6.8},{name:'타타 컨설턴시', pct:5.5},{name:'힌두스탄 유니레버', pct:4.2},{name:'나머지 44종목', pct:56.0}]},
-  '305540': { name:'TIGER 2차전지테마', desc:'국내 2차전지 밸류체인 테마주', holdings:[
-    {name:'POSCO홀딩스', pct:20.0},{name:'에코프로비엠', pct:15.5},{name:'LG에너지솔루션', pct:14.0},{name:'삼성SDI', pct:12.0},{name:'에코프로', pct:9.5},{name:'SK이노베이션', pct:8.0},{name:'일진머티리얼즈', pct:6.0},{name:'나머지 2차전지주', pct:15.0}]},
-  '445090': { name:'KODEX 미국AI테크', desc:'미국 AI 핵심 기업 집중 편입', holdings:[
-    {name:'NVIDIA', pct:22.0},{name:'Microsoft', pct:18.0},{name:'Alphabet', pct:14.0},{name:'Meta Platforms', pct:12.0},{name:'Amazon (AWS)', pct:10.0},{name:'Palantir', pct:7.5},{name:'Salesforce', pct:6.0},{name:'나머지 AI주', pct:10.5}]},
-  '476400': { name:'TIGER 글로벌AI액티브', desc:'글로벌 AI 주식 액티브 운용', holdings:[
-    {name:'NVIDIA', pct:18.0},{name:'Microsoft', pct:14.0},{name:'Alphabet', pct:10.0},{name:'TSMC', pct:8.5},{name:'Meta Platforms', pct:8.0},{name:'Samsung Electronics', pct:6.0},{name:'ASML', pct:5.5},{name:'나머지 AI 종목', pct:30.0}]},
-  '429000': { name:'TIGER 글로벌반도체액티브', desc:'글로벌 반도체 밸류체인 액티브', holdings:[
-    {name:'NVIDIA', pct:15.0},{name:'TSMC', pct:14.0},{name:'Samsung Electronics', pct:10.0},{name:'ASML', pct:9.5},{name:'Broadcom', pct:8.5},{name:'SK하이닉스', pct:7.0},{name:'Qualcomm', pct:6.5},{name:'Applied Materials', pct:6.0},{name:'나머지 반도체주', pct:23.5}]},
-  '453550': { name:'SOL 로봇&AI', desc:'글로벌 로봇·자동화·AI 종목', holdings:[
-    {name:'Intuitive Surgical', pct:8.5},{name:'ABB', pct:7.8},{name:'Keyence', pct:7.2},{name:'Fanuc', pct:6.5},{name:'Rockwell Automation', pct:6.0},{name:'Universal Robots', pct:5.5},{name:'Zebra Technologies', pct:5.0},{name:'나머지 로봇·AI주', pct:53.5}]},
-  '466920': { name:'TIGER 미국항공우주&방산', desc:'미국 항공우주·방위산업 대표 종목', holdings:[
-    {name:'Lockheed Martin', pct:14.0},{name:'RTX (Raytheon)', pct:13.5},{name:'Northrop Grumman', pct:12.0},{name:'L3Harris', pct:10.0},{name:'Boeing', pct:9.5},{name:'General Dynamics', pct:9.0},{name:'Leidos Holdings', pct:7.5},{name:'나머지 방산주', pct:24.5}]},
-  '448540': { name:'ACE KRX금현물', desc:'KRX 금 현물 — 국내 금 시장 직접 투자', holdings:[
-    {name:'KRX 금 현물 (순금)', pct:99.0},{name:'현금·기타', pct:1.0}]},
-  '441640': { name:'ACE 미국빅테크커버드콜채권혼합', desc:'빅테크+커버드콜+채권 혼합 액티브', holdings:[
-    {name:'Apple', pct:12.0},{name:'Microsoft', pct:11.0},{name:'NVIDIA', pct:10.0},{name:'Amazon', pct:9.0},{name:'Meta Platforms', pct:8.0},{name:'Alphabet', pct:8.0},{name:'미국 국채 (혼합)', pct:20.0},{name:'나머지 종목', pct:22.0}]},
-  '456760': { name:'KODEX 미국S&P500배당귀족커버드콜', desc:'S&P500 배당귀족 + 커버드콜', holdings:[
-    {name:'Coca-Cola', pct:4.5},{name:'Procter & Gamble', pct:4.2},{name:'Johnson & Johnson', pct:4.0},{name:'3M', pct:3.8},{name:'Colgate-Palmolive', pct:3.5},{name:'Consolidated Edison', pct:3.2},{name:'나머지 배당귀족', pct:76.8}]},
-  '273130': { name:'KODEX 미국러셀2000(H)', desc:'Russell 2000 — 미국 중소형주 2000종목, 환헤지', holdings:[
-    {name:'iShares Russell 2000 (IWM)', pct:99.0},{name:'현금·기타', pct:1.0}]},
-  '252670': { name:'KODEX 200선물인버스2X', desc:'코스피200 선물 -2배 — 하락장 베팅 상품', holdings:[
-    {name:'코스피200 선물 (인버스 2배)', pct:99.0},{name:'현금·기타', pct:1.0}]},
-  '122630': { name:'KODEX 레버리지', desc:'코스피200 선물 2배 — 상승장 베팅 고위험', holdings:[
-    {name:'코스피200 선물 (레버리지 2배)', pct:99.0},{name:'현금·기타', pct:1.0}]},
-  '371460': { name:'TIGER KRX바이오K-뉴딜', desc:'KRX 바이오 — 국내 바이오·헬스케어', holdings:[
-    {name:'삼성바이오로직스', pct:18.0},{name:'셀트리온', pct:15.0},{name:'SK바이오팜', pct:8.5},{name:'한미약품', pct:7.0},{name:'유한양행', pct:6.5},{name:'녹십자', pct:5.5},{name:'나머지 바이오주', pct:39.5}]},
-  '395160': { name:'TIGER 차이나항셍테크', desc:'항셍테크 — 홍콩 상장 중국 빅테크', holdings:[
-    {name:'알리바바', pct:12.0},{name:'텐센트', pct:11.5},{name:'샤오미', pct:8.0},{name:'메이투안', pct:7.5},{name:'바이두', pct:7.0},{name:'넷이즈', pct:6.5},{name:'나머지 중국 테크', pct:47.5}]},
-  '449450': { name:'KODEX 클라우드컴퓨팅', desc:'미국 클라우드 컴퓨팅 기업 집중', holdings:[
-    {name:'Microsoft (Azure)', pct:14.0},{name:'Amazon (AWS)', pct:13.0},{name:'Alphabet (GCP)', pct:12.0},{name:'Salesforce', pct:8.5},{name:'ServiceNow', pct:7.5},{name:'Snowflake', pct:7.0},{name:'나머지 클라우드주', pct:38.0}]},
-  '363580': { name:'TIGER 헬스케어', desc:'미국 헬스케어 대표 종목', holdings:[
-    {name:'UnitedHealth Group', pct:10.5},{name:'Johnson & Johnson', pct:9.8},{name:'Eli Lilly', pct:8.5},{name:'AbbVie', pct:7.2},{name:'Merck', pct:6.8},{name:'Thermo Fisher', pct:5.5},{name:'나머지 헬스케어주', pct:51.7}]},
-  '395750': { name:'KODEX K-메타버스액티브', desc:'국내 메타버스 관련주 액티브', holdings:[
-    {name:'SK텔레콤', pct:12.0},{name:'NAVER', pct:11.0},{name:'카카오', pct:10.0},{name:'컴투스', pct:8.5},{name:'네오위즈', pct:7.5},{name:'제이씨현시스템', pct:6.5},{name:'나머지 메타버스주', pct:44.5}]},
-  '468370': { name:'TIGER 인도니프티50레버리지', desc:'NIFTY50 2배 — 인도 주식 레버리지', holdings:[
-    {name:'NIFTY50 선물 (2배 레버리지)', pct:99.0},{name:'현금·기타', pct:1.0}]},
-  '453060': { name:'ACE 인도네시아MSCI(합성)', desc:'MSCI 인도네시아 — 인도네시아 대형주', holdings:[
-    {name:'Bank Central Asia', pct:12.0},{name:'Bank Rakyat Indonesia', pct:10.5},{name:'Astra International', pct:8.0},{name:'Telkom Indonesia', pct:7.5},{name:'Bank Mandiri', pct:7.0},{name:'나머지 인도네시아주', pct:55.0}]},
-  '479030': { name:'SOL 인도인프라', desc:'인도 인프라 종목 — 건설·에너지·교통', holdings:[
-    {name:'Larsen & Toubro', pct:12.0},{name:'Reliance Industries', pct:10.0},{name:'NTPC', pct:8.5},{name:'Power Grid', pct:7.5},{name:'Adani Ports', pct:7.0},{name:'나머지 인프라주', pct:55.0}]},
-  '486630': { name:'ACE 베트남VN30(합성)', desc:'VN30 — 베트남 대형주 30종목', holdings:[
-    {name:'Vinhomes', pct:14.0},{name:'VinFast', pct:12.0},{name:'Vietcombank', pct:10.5},{name:'Vingroup', pct:9.0},{name:'FPT Corporation', pct:7.5},{name:'나머지 베트남주', pct:47.0}]},
-  '476040': { name:'TIGER 미국30년국채커버드콜액티브(H)', desc:'미국 30년 국채 + 커버드콜, 월배당', holdings:[
-    {name:'US Treasury 30Y + 콜옵션 매도', pct:95.0},{name:'현금·기타', pct:5.0}]},
-  '476050': { name:'KODEX 미국30년국채타겟커버드콜(합성H)', desc:'미국 30년 국채 + 커버드콜, 합성', holdings:[
-    {name:'US Treasury 30Y (합성)', pct:95.0},{name:'현금·기타', pct:5.0}]},
-};
-
 function showCompModal(code, name) {
   const data = ETF_COMPOSITION[code];
   const modal = document.getElementById('etf-comp-modal');
@@ -4007,6 +3885,16 @@ function initAuth() { /* 로그인 없이 바로 진입 */ }
 
 
 /* ══ 테마 토글 ══ */
+
+function toggleChat() {
+  const panel = document.getElementById('chat-panel');
+  const overlay = document.getElementById('chat-overlay');
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none' && panel.style.display !== '';
+  panel.style.display = isOpen ? 'none' : 'flex';
+  if (overlay) overlay.style.display = isOpen ? 'none' : 'block';
+  document.body.style.overflow = isOpen ? '' : 'hidden';
+}
 function toggleTheme() {
   const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
   document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
