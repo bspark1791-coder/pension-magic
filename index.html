@@ -1152,6 +1152,7 @@ footer{text-align:center;padding:28px 0 0;font-size:12px;color:var(--text3);bord
     <button class="nav-btn" data-page="etfrec"           onclick="showPage('etfrec')" style="border-color:rgba(201,123,240,0.4);color:var(--port)">📡 시장 나침반</button>
     <button class="nav-btn" data-page="goalcalc"         onclick="showPage('goalcalc')" style="border-color:rgba(232,85,85,0.4);color:var(--red);font-weight:700">🎯 노후설계</button>
     <button class="nav-btn" data-page="childplan"        onclick="showPage('childplan')" style="border-color:rgba(255,180,50,0.4);color:#ffb432">👶 자녀투자</button>
+    <button class="nav-btn" data-page="inequality"       onclick="showPage('inequality')" style="border-color:rgba(232,85,85,0.4);color:#e85555">⚖️ 양극화</button>
   </div>
   <div class="nav-user-area">
     <span class="nav-username" id="nav-username"></span>
@@ -1179,6 +1180,7 @@ footer{text-align:center;padding:28px 0 0;font-size:12px;color:var(--text3);bord
   <button class="nav-btn" data-page="etfrec"    onclick="showPage('etfrec');closeMobileNav()">📡 시장 나침반</button>
   <button class="nav-btn" data-page="goalcalc"  onclick="showPage('goalcalc');closeMobileNav()">🎯 노후설계</button>
   <button class="nav-btn" data-page="childplan" onclick="showPage('childplan');closeMobileNav()">👶 자녀투자</button>
+  <button class="nav-btn" data-page="inequality" onclick="showPage('inequality');closeMobileNav()">⚖️ 양극화</button>
   <div class="nav-user-area" style="display:flex;margin-top:auto;padding-top:20px;border-top:1px solid var(--border)">
     <span class="nav-username" id="nav-username-mobile"></span>
     <button class="nav-logout-btn" id="nav-logout-btn-mobile" onclick="doLogout()" style="display:none">로그아웃</button>
@@ -2619,6 +2621,7 @@ Coca-Cola	=GOOGLEFINANCE("NYSE:KO","price")	=GOOGLEFINANCE("NYSE:KO","changepct"
   <div class="merged-subtabs">
     <button class="msub-btn active" data-sub="about" onclick="showSubTab('insight','about')">✨ 연금의 마술사</button>
     <button class="msub-btn" data-sub="news" onclick="showSubTab('insight','news')" style="color:var(--red)">📰 뉴스</button>
+    <button class="msub-btn" data-sub="global" onclick="showSubTab('insight','global')" style="color:#ffb432">🌍 글로벌 연금</button>
   </div>
   <div id="insight-about" class="msub-panel active" style="display:block">
 <div class="page">
@@ -2992,6 +2995,216 @@ Coca-Cola	=GOOGLEFINANCE("NYSE:KO","price")	=GOOGLEFINANCE("NYSE:KO","changepct"
     <button onclick="addNews()" style="padding:9px 20px;background:rgba(232,85,85,0.15);border:1px solid rgba(232,85,85,0.3);border-radius:8px;color:var(--red);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans)">+ 뉴스 추가</button>
   </div>
 </div>
+<div id="insight-global" class="msub-panel" style="display:none">
+  <div style="max-width:900px;margin:0 auto;padding:16px 0">
+
+    <!-- 헤더 -->
+    <div style="margin-bottom:28px">
+      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,180,50,0.1);border:1px solid rgba(255,180,50,0.3);border-radius:20px;padding:4px 14px;font-size:11px;color:#ffb432;letter-spacing:0.08em;margin-bottom:12px">
+        🌍 GLOBAL PENSION COMPARISON
+      </div>
+      <h2 style="font-size:clamp(20px,4vw,28px);font-weight:800;color:var(--text);margin:0 0 8px">
+        미국 401(k)로 보는 <span style="color:#ffb432">진짜 노후 준비</span>
+      </h2>
+      <p style="font-size:13px;color:var(--text3);margin:0;line-height:1.7">
+        서양인들이 동남아에서 배당금으로 여유롭게 사는 이유 — 구조적 차이를 알면 한국에서도 가능합니다
+      </p>
+    </div>
+
+    <!-- 왜 서양인들은 동남아에서 살 수 있나? -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px">
+      <h3 style="font-size:15px;font-weight:700;color:var(--text);margin:0 0 16px">🏖️ 왜 서양인들은 동남아에서 여유롭게 살 수 있나?</h3>
+      <div style="display:grid;gap:10px">
+        <div style="background:var(--bg3);border-left:3px solid #ffb432;border-radius:0 10px 10px 0;padding:14px 16px">
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px">1️⃣ 달러·유로 환율 레버리지</div>
+          <div style="font-size:12px;color:var(--text3);line-height:1.8">
+            배당금을 달러로 받고 태국·베트남에서 씀 → 현지 생활비 월 <strong style="color:#ffb432">70~100만원</strong>이면 충분.<br>
+            월 $700(약 98만원) 배당이면 현지에선 중산층 생활. 한국에서 같은 생활을 하려면 월 250만원 이상 필요.
+          </div>
+        </div>
+        <div style="background:var(--bg3);border-left:3px solid var(--irp);border-radius:0 10px 10px 0;padding:14px 16px">
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px">2️⃣ 401(k) — 직장 다니면 자동으로 쌓이는 구조</div>
+          <div style="font-size:12px;color:var(--text3);line-height:1.8">
+            미국은 직장인이 월급의 5% 넣으면 <strong style="color:var(--irp)">회사가 3~5% 추가 매칭</strong>. 내 돈 + 회사 돈이 S&P500에 자동 투자.<br>
+            20년 직장생활하면 의식하지 않아도 수억 원이 쌓임. 한국 퇴직금은 일시금으로 받아서 치킨집으로...
+          </div>
+        </div>
+        <div style="background:var(--bg3);border-left:3px solid var(--isa);border-radius:0 10px 10px 0;padding:14px 16px">
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px">3️⃣ 소셜 시큐리티(미국 국민연금) 추가</div>
+          <div style="font-size:12px;color:var(--text3);line-height:1.8">
+            401(k) 배당 + 소셜 시큐리티(월 최대 <strong style="color:var(--isa)">$4,960, 약 695만원</strong>) = 총 월 300~500만원.<br>
+            달러로 받아서 동남아 가면 남는 돈으로 저축까지 가능. 이게 그들이 여유로운 이유.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 401(k) 20년 시뮬레이션 -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px">
+      <h3 style="font-size:15px;font-weight:700;color:var(--text);margin:0 0 6px">📊 401(k) 20년 적립 시뮬레이션</h3>
+      <p style="font-size:12px;color:var(--text3);margin:0 0 20px">월 납입액과 수익률을 바꿔보세요 (피델리티 2025 기준)</p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px">
+        <div>
+          <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">월 납입액 ($)</label>
+          <input type="text" id="g401-monthly" value="500" inputmode="numeric" class="comma-input" data-calc="calc401k"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:15px;color:var(--text);font-family:var(--mono);box-sizing:border-box">
+          <div style="font-size:10px;color:var(--text3);margin-top:3px">한도 $1,917/월 (2025)</div>
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">회사 매칭 비율</label>
+          <div style="display:flex;gap:6px">
+            <button onclick="setMatch(0)"   data-match="0"   style="flex:1;padding:8px;border-radius:7px;font-size:11px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--sans)">없음</button>
+            <button onclick="setMatch(0.03)" data-match="0.03" style="flex:1;padding:8px;border-radius:7px;font-size:11px;border:1px solid rgba(255,180,50,0.4);background:rgba(255,180,50,0.12);color:#ffb432;cursor:pointer;font-family:var(--sans)">3%</button>
+            <button onclick="setMatch(0.05)" data-match="0.05" style="flex:1;padding:8px;border-radius:7px;font-size:11px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--sans)">5%</button>
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px">회사가 추가로 넣어주는 금액</div>
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">연 수익률 — <span id="g401-rate-label" style="color:var(--irp);font-weight:700">8%</span></label>
+          <input type="range" id="g401-rate" min="4" max="12" step="0.5" value="8" oninput="calc401k()"
+            style="width:100%;accent-color:var(--irp)">
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3)">
+            <span>4%</span><span style="color:var(--irp)">S&P500 역대 ~10%</span><span>12%</span>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">적립 기간</label>
+          <div style="display:flex;gap:6px">
+            <button onclick="set401kYears(10)" data-yr401="10" style="flex:1;padding:8px;border-radius:7px;font-size:11px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--sans)">10년</button>
+            <button onclick="set401kYears(20)" data-yr401="20" style="flex:1;padding:8px;border-radius:7px;font-size:11px;border:1px solid rgba(52,201,122,0.4);background:rgba(52,201,122,0.12);color:var(--irp);cursor:pointer;font-family:var(--sans)">20년</button>
+            <button onclick="set401kYears(30)" data-yr401="30" style="flex:1;padding:8px;border-radius:7px;font-size:11px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--sans)">30년</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 결과 -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px">
+        <div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">내 납입 총액</div>
+          <div style="font-size:17px;font-weight:700;color:var(--text);font-family:var(--mono)" id="g401-my-total">—</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:11px;color:#ffb432;margin-bottom:4px">회사 매칭 합계</div>
+          <div style="font-size:17px;font-weight:700;color:#ffb432;font-family:var(--mono)" id="g401-match-total">—</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:11px;color:var(--irp);margin-bottom:4px">복리 수익</div>
+          <div style="font-size:17px;font-weight:700;color:var(--irp);font-family:var(--mono)" id="g401-profit">—</div>
+        </div>
+        <div style="background:linear-gradient(135deg,rgba(255,180,50,0.12),rgba(52,201,122,0.12));border:1px solid rgba(255,180,50,0.35);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:11px;color:#ffb432;margin-bottom:4px">총 자산</div>
+          <div style="font-size:20px;font-weight:800;color:#ffb432;font-family:var(--mono)" id="g401-total">—</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid rgba(52,201,122,0.2);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:11px;color:var(--irp);margin-bottom:4px">월 배당 (4% 룰)</div>
+          <div style="font-size:17px;font-weight:700;color:var(--irp);font-family:var(--mono)" id="g401-monthly-div">—</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:11px;color:var(--isa);margin-bottom:4px">소셜시큐리티 포함</div>
+          <div style="font-size:17px;font-weight:700;color:var(--isa);font-family:var(--mono)" id="g401-with-ss">—</div>
+        </div>
+      </div>
+
+      <!-- 원화 환산 + 동남아 생활 가능 여부 -->
+      <div id="g401-comment" style="padding:14px 16px;border-radius:10px;border:1px solid rgba(255,180,50,0.25);background:rgba(255,180,50,0.05);font-size:12px;color:var(--text2);line-height:1.9"></div>
+    </div>
+
+    <!-- 한국 vs 미국 비교표 -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px">
+      <h3 style="font-size:15px;font-weight:700;color:var(--text);margin:0 0 16px">🇰🇷 vs 🇺🇸 연금 시스템 비교</h3>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead>
+            <tr style="background:var(--bg3)">
+              <th style="padding:10px 14px;text-align:left;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border)">구분</th>
+              <th style="padding:10px 14px;text-align:center;color:var(--isa);font-weight:600;border-bottom:1px solid var(--border)">🇺🇸 미국 401(k)</th>
+              <th style="padding:10px 14px;text-align:center;color:var(--irp);font-weight:600;border-bottom:1px solid var(--border)">🇰🇷 한국 IRP+연금저축</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 14px;color:var(--text3)">연간 납입 한도</td>
+              <td style="padding:10px 14px;text-align:center;color:var(--isa);font-weight:600">$23,000 (약 3,220만원)</td>
+              <td style="padding:10px 14px;text-align:center;color:var(--irp);font-weight:600">1,800만원</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);background:rgba(255,180,50,0.03)">
+              <td style="padding:10px 14px;color:var(--text3)">회사 매칭</td>
+              <td style="padding:10px 14px;text-align:center;color:#ffb432;font-weight:600">✅ 평균 3~5% 추가</td>
+              <td style="padding:10px 14px;text-align:center;color:var(--text3)">❌ 없음 (퇴직금 별도)</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 14px;color:var(--text3)">세금 혜택</td>
+              <td style="padding:10px 14px;text-align:center;color:var(--isa)">납입 시 소득공제</td>
+              <td style="padding:10px 14px;text-align:center;color:var(--irp)">세액공제 최대 148만원</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);background:rgba(255,180,50,0.03)">
+              <td style="padding:10px 14px;color:var(--text3)">투자 자산</td>
+              <td style="padding:10px 14px;text-align:center;color:var(--isa)">S&P500 ETF 중심</td>
+              <td style="padding:10px 14px;text-align:center;color:var(--irp)">ETF·펀드 (국내외)</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 14px;color:var(--text3)">수령 화폐</td>
+              <td style="padding:10px 14px;text-align:center;color:#ffb432;font-weight:600">💵 달러 (환율 레버리지)</td>
+              <td style="padding:10px 14px;text-align:center;color:var(--text3)">🇰🇷 원화</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);background:rgba(255,180,50,0.03)">
+              <td style="padding:10px 14px;color:var(--text3)">국민연금 추가</td>
+              <td style="padding:10px 14px;text-align:center;color:var(--isa)">소셜시큐리티 월 최대 $4,960</td>
+              <td style="padding:10px 14px;text-align:center;color:var(--irp)">국민연금 월 평균 65만원</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 14px;color:var(--text3);font-weight:600">20년 후 예상 월 수령</td>
+              <td style="padding:10px 14px;text-align:center;color:#ffb432;font-weight:700;font-size:13px">$2,000~5,000<br><span style="font-size:10px;color:var(--text3)">(280~700만원)</span></td>
+              <td style="padding:10px 14px;text-align:center;color:var(--irp);font-weight:700;font-size:13px">월 50~150만원<br><span style="font-size:10px;color:var(--text3)">(납입액 따라 다름)</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 한국인이 비슷하게 하는 법 -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px">
+      <h3 style="font-size:15px;font-weight:700;color:var(--text);margin:0 0 16px">💡 한국인이 401(k)처럼 하는 법</h3>
+      <div style="display:grid;gap:10px">
+        <div style="background:var(--bg3);border-radius:12px;padding:16px;display:flex;gap:14px;align-items:flex-start">
+          <div style="font-size:24px;flex-shrink:0">1️⃣</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">IRP + 개인연금 한도 꽉 채우기</div>
+            <div style="font-size:12px;color:var(--text3);line-height:1.7">연 1,800만원 한도 최대 활용. 세액공제 148만원 + 복리 운용. 이게 한국판 401(k).</div>
+          </div>
+        </div>
+        <div style="background:var(--bg3);border-radius:12px;padding:16px;display:flex;gap:14px;align-items:flex-start">
+          <div style="font-size:24px;flex-shrink:0">2️⃣</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">달러 자산으로 환율 레버리지 챙기기</div>
+            <div style="font-size:12px;color:var(--text3);line-height:1.7">연금계좌 안에서 TIGER 미국S&P500, ACE 나스닥100 매수 → 달러 자산을 원화 계좌로 보유하는 효과. 원화 약세 시 환차익까지.</div>
+          </div>
+        </div>
+        <div style="background:var(--bg3);border-radius:12px;padding:16px;display:flex;gap:14px;align-items:flex-start">
+          <div style="font-size:24px;flex-shrink:0">3️⃣</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">배당 ETF로 월 현금흐름 만들기</div>
+            <div style="font-size:12px;color:var(--text3);line-height:1.7">ACE 미국배당다우존스(월배당), TIGER 미국배당+7%프리미엄 → 매달 배당금 자동 입금. 자산 5억 모이면 월 150~200만원 현금흐름 가능.</div>
+          </div>
+        </div>
+        <div style="background:linear-gradient(135deg,rgba(255,180,50,0.08),rgba(52,201,122,0.08));border:1px solid rgba(255,180,50,0.25);border-radius:12px;padding:16px;display:flex;gap:14px;align-items:flex-start">
+          <div style="font-size:24px;flex-shrink:0">🎯</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#ffb432;margin-bottom:4px">목표: 자산 5억 + 국민연금 → 동남아 가능</div>
+            <div style="font-size:12px;color:var(--text3);line-height:1.7">배당 월 150만원 + 국민연금 65만원 = 월 215만원. 태국·베트남 생활비 100~130만원 → <strong style="color:var(--irp)">충분히 가능합니다.</strong> 미국인처럼 달러로 받지 못해도 이 조합이면 동남아 장기 체류 현실적.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 출처 -->
+    <div style="font-size:11px;color:var(--text3);text-align:center;padding:8px">
+      📊 출처: Fidelity Investments Q3 2025, 미국 노동통계국(BLS) 2025, 국민연금공단 2025 · 환율 1달러=1,400원 기준 · 참고용입니다
+    </div>
+  </div>
+</div>
+
 <footer><p>뉴스는 직접 추가·관리합니다. 링크 클릭 시 해당 언론사 페이지로 이동합니다.</p></footer>
   </div>
 </div><!-- /page-insight -->
@@ -3316,14 +3529,14 @@ Coca-Cola	=GOOGLEFINANCE("NYSE:KO","price")	=GOOGLEFINANCE("NYSE:KO","changepct"
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:20px">
         <div>
           <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">1차 증여 금액 (0세, 만원)</label>
-          <input type="number" id="child-gift1" value="2000" min="0" max="2000"
+          <input type="text" id="child-gift1" value="2,000" inputmode="numeric" class="comma-input" data-calc="calcChildPlan" min="0" max="2000"
             style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:15px;color:var(--text);font-family:var(--mono);box-sizing:border-box"
             oninput="calcChildPlan()">
           <div style="font-size:11px;color:var(--text3);margin-top:4px">한도 2,000만원</div>
         </div>
         <div>
           <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">2차 증여 금액 (11세, 만원)</label>
-          <input type="number" id="child-gift2" value="2000" min="0" max="2000"
+          <input type="text" id="child-gift2" value="2,000" inputmode="numeric" class="comma-input" data-calc="calcChildPlan" min="0" max="2000"
             style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:15px;color:var(--text);font-family:var(--mono);box-sizing:border-box"
             oninput="calcChildPlan()">
           <div style="font-size:11px;color:var(--text3);margin-top:4px">한도 2,000만원</div>
@@ -3451,6 +3664,498 @@ Coca-Cola	=GOOGLEFINANCE("NYSE:KO","price")	=GOOGLEFINANCE("NYSE:KO","changepct"
 
   </div>
 </div><!-- /page-childplan -->
+
+<!-- ══ 양극화 대시보드 ══ -->
+<div id="page-inequality" class="page-view">
+<div style="max-width:1000px;margin:0 auto;padding:24px 16px">
+
+  <!-- 헤더 -->
+  <div style="margin-bottom:28px">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(232,85,85,0.1);border:1px solid rgba(232,85,85,0.3);border-radius:20px;padding:4px 14px;font-size:11px;color:#e85555;letter-spacing:0.08em;margin-bottom:12px">
+      ⚖️ INEQUALITY DASHBOARD
+    </div>
+    <h1 style="font-size:clamp(22px,5vw,34px);font-weight:800;color:var(--text);margin:0 0 8px">
+      대한민국 <span style="color:#e85555">양극화</span> 현황
+    </h1>
+    <p style="font-size:13px;color:var(--text3);margin:0">자산·소득·세대·부동산 양극화 데이터 시각화 · 투자 관점 해석</p>
+  </div>
+
+  <!-- 핵심 지표 카드 4개 -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:28px">
+    <div style="background:var(--bg2);border:1px solid rgba(232,85,85,0.3);border-radius:14px;padding:16px;text-align:center">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:6px">순자산 지니계수</div>
+      <div style="font-size:28px;font-weight:800;color:#e85555;font-family:var(--mono)">0.625</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">▲ 역대 최고치 (한국은행)</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid rgba(255,180,50,0.3);border-radius:14px;padding:16px;text-align:center">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:6px">상위 20% vs 하위 20%</div>
+      <div style="font-size:28px;font-weight:800;color:#ffb432;font-family:var(--mono)">58.5%</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">가구 평균 자산 5억 6,678만원</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid rgba(61,142,240,0.3);border-radius:14px;padding:16px;text-align:center">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:6px">소득 5분위 배율</div>
+      <div style="font-size:28px;font-weight:800;color:var(--isa);font-family:var(--mono)">5.78배</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">상위 20% vs 하위 20% 소득</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid rgba(52,201,122,0.3);border-radius:14px;padding:16px;text-align:center">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:6px">순자산 상하위 격차</div>
+      <div style="font-size:28px;font-weight:800;color:var(--irp);font-family:var(--mono)">1:7.8</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">순자산 1분위 vs 5분위</div>
+    </div>
+  </div>
+
+  <!-- 차트 섹션 1: 자산 양극화 -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:20px">
+
+    <!-- 자산 분포 막대 차트 -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px">
+      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin:0 0 4px">💰 계층별 자산 점유율</h3>
+      <p style="font-size:11px;color:var(--text3);margin:0 0 16px">전체 가구 자산 기준 (국가데이터처)</p>
+      <canvas id="chart-asset-dist" height="200"></canvas>
+    </div>
+
+    <!-- 소득 분위별 임금 -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px">
+      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin:0 0 4px">💼 소득 분위별 월평균 임금</h3>
+      <p style="font-size:11px;color:var(--text3);margin:0 0 16px">10분위 기준 만원 (고용노동부)</p>
+      <canvas id="chart-income-dist" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- 차트 섹션 2: 세대/부동산 -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:20px">
+
+    <!-- 세대별 순자산 -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px">
+      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin:0 0 4px">👥 세대별 평균 순자산</h3>
+      <p style="font-size:11px;color:var(--text3);margin:0 0 16px">연령대별 가구 평균 만원</p>
+      <canvas id="chart-generation" height="200"></canvas>
+    </div>
+
+    <!-- 부동산 자산 비중 추이 -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px">
+      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin:0 0 4px">🏠 서울 아파트 vs 평균 임금 배율</h3>
+      <p style="font-size:11px;color:var(--text3);margin:0 0 16px">서울 중위 아파트가 연봉 몇 배인가 (PIR)</p>
+      <canvas id="chart-pir" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- 내 위치 찾기 계산기 -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px">
+    <h3 style="font-size:15px;font-weight:700;color:var(--text);margin:0 0 6px">🎯 나는 어디에 있을까?</h3>
+    <p style="font-size:12px;color:var(--text3);margin:0 0 20px">월 소득과 순자산을 입력하면 전국 기준 내 위치를 알려드려요</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px">
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">월 소득 (만원)</label>
+        <input type="text" id="ineq-income" value="350" inputmode="numeric" class="comma-input" data-calc="calcMyPosition" min="0"
+          style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:15px;color:var(--text);font-family:var(--mono);box-sizing:border-box"
+          oninput="calcMyPosition()">
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">순자산 (만원)</label>
+        <input type="text" id="ineq-asset" value="15,000" inputmode="numeric" class="comma-input" data-calc="calcMyPosition" min="0"
+          style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:15px;color:var(--text);font-family:var(--mono);box-sizing:border-box"
+          oninput="calcMyPosition()">
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">나이</label>
+        <input type="number" id="ineq-age" value="35" min="20" max="70"
+          style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:15px;color:var(--text);font-family:var(--mono);box-sizing:border-box"
+          oninput="calcMyPosition()">
+      </div>
+    </div>
+
+    <!-- 결과 -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:16px">
+      <div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px">소득 분위</div>
+        <div style="font-size:22px;font-weight:800;font-family:var(--mono)" id="ineq-res-income-tier">—</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px" id="ineq-res-income-desc">—</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px">자산 분위</div>
+        <div style="font-size:22px;font-weight:800;font-family:var(--mono)" id="ineq-res-asset-tier">—</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px" id="ineq-res-asset-desc">—</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px">동나이대 자산 평균</div>
+        <div style="font-size:22px;font-weight:800;color:var(--isa);font-family:var(--mono)" id="ineq-res-age-avg">—</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px" id="ineq-res-age-diff">—</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px">종합 판정</div>
+        <div style="font-size:16px;font-weight:800;" id="ineq-res-verdict">—</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px" id="ineq-res-action">—</div>
+      </div>
+    </div>
+
+    <!-- 소득 바 시각화 -->
+    <div style="margin-top:8px">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:8px">전국 소득 분포에서 내 위치</div>
+      <div style="background:var(--bg3);border-radius:8px;height:20px;position:relative;overflow:hidden">
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,#3d8ef0,#34c97a,#ffb432,#e85555);border-radius:8px"></div>
+        <div id="ineq-income-marker" style="position:absolute;top:0;bottom:0;width:3px;background:white;border-radius:2px;transition:left 0.4s;left:50%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:4px">
+        <span>하위 10%<br>~120만원</span>
+        <span style="text-align:center">중위<br>350만원</span>
+        <span style="text-align:right">상위 10%<br>900만원+</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 투자 관점 인사이트 -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px">
+    <h3 style="font-size:15px;font-weight:700;color:var(--text);margin:0 0 16px">💡 양극화 시대, 투자 전략</h3>
+    <div style="display:grid;gap:10px">
+      <div style="background:var(--bg3);border-left:3px solid #e85555;border-radius:0 10px 10px 0;padding:14px 16px">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">⚠️ 현금 보유 = 자산 하락</div>
+        <div style="font-size:12px;color:var(--text3);line-height:1.7">물가상승률(3~4%)보다 낮은 예금금리 → 실질 자산 감소. 양극화 시대에 현금 보유는 하위 계층으로 이동하는 지름길</div>
+      </div>
+      <div style="background:var(--bg3);border-left:3px solid #ffb432;border-radius:0 10px 10px 0;padding:14px 16px">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">📈 자산소득 > 근로소득</div>
+        <div style="font-size:12px;color:var(--text3);line-height:1.7">상위 1%의 소득 중 자산소득 비중 72%. S&P500·배당ETF 등 자산 투자로 수동소득 만들기가 양극화 탈출의 핵심</div>
+      </div>
+      <div style="background:var(--bg3);border-left:3px solid var(--irp);border-radius:0 10px 10px 0;padding:14px 16px">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">🏦 연금 = 중산층 방어선</div>
+        <div style="font-size:12px;color:var(--text3);line-height:1.7">개인연금+IRP 연 1,800만원 한도 최대 활용. 세액공제 + 복리 운용으로 노후 자산 격차를 좁히는 가장 현실적 수단</div>
+      </div>
+      <div style="background:var(--bg3);border-left:3px solid var(--isa);border-radius:0 10px 10px 0;padding:14px 16px">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">👶 자녀 증여 = 세대 대물림 차단</div>
+        <div style="font-size:12px;color:var(--text3);line-height:1.7">세대 양극화 해소의 핵심은 조기 자산 형성. 0세부터 4,000만원 증여 + ETF 투자로 20세에 1억 8천만원 목표</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── 섹션1: 내 위치 상세 시각화 (피라미드) ── -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px">
+    <h3 style="font-size:15px;font-weight:700;color:var(--text);margin:0 0 6px">📊 대한민국 자산 피라미드에서 내 위치</h3>
+    <p style="font-size:12px;color:var(--text3);margin:0 0 20px">순자산을 입력하면 전국 기준 상위 몇 %인지 피라미드로 보여드려요</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">내 순자산 (만원)</label>
+        <input type="text" id="pyr-asset" value="30,000" inputmode="numeric" class="comma-input" data-calc="calcPyramid"
+          style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:15px;color:var(--text);font-family:var(--mono);box-sizing:border-box">
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">월 소득 (만원)</label>
+        <input type="text" id="pyr-income" value="350" inputmode="numeric" class="comma-input" data-calc="calcPyramid"
+          style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:15px;color:var(--text);font-family:var(--mono);box-sizing:border-box">
+      </div>
+    </div>
+
+    <!-- 피라미드 시각화 -->
+    <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap">
+      <!-- 피라미드 -->
+      <div style="flex:1;min-width:200px">
+        <div id="pyramid-wrap" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0">
+          <!-- JS로 렌더링 -->
+        </div>
+      </div>
+      <!-- 결과 텍스트 -->
+      <div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:10px;justify-content:center">
+        <div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">자산 기준 상위</div>
+          <div style="font-size:32px;font-weight:800;color:#e85555;font-family:var(--mono)" id="pyr-pct">—</div>
+          <div style="font-size:12px;color:var(--text3)" id="pyr-tier-label">—</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">내 앞에 있는 가구 수</div>
+          <div style="font-size:20px;font-weight:700;color:#ffb432;font-family:var(--mono)" id="pyr-ahead">—</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">다음 단계까지 필요 자산</div>
+          <div style="font-size:18px;font-weight:700;color:var(--irp);font-family:var(--mono)" id="pyr-next">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 섹션2: 노후 준비 점수 ── -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px">
+    <h3 style="font-size:15px;font-weight:700;color:var(--text);margin:0 0 6px">🏆 나의 노후 준비 점수는?</h3>
+    <p style="font-size:12px;color:var(--text3);margin:0 0 20px">월 저축액과 자산을 입력하면 통계청 기준으로 대한민국 상위 몇 %인지 알려드려요</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px">
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">월 저축/투자액 (만원)</label>
+        <input type="text" id="score-monthly" value="50" inputmode="numeric" class="comma-input" data-calc="calcRetirementScore"
+          style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:15px;color:var(--text);font-family:var(--mono);box-sizing:border-box">
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">현재 연금 자산 (만원)</label>
+        <input type="text" id="score-pension" value="0" inputmode="numeric" class="comma-input" data-calc="calcRetirementScore"
+          style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:15px;color:var(--text);font-family:var(--mono);box-sizing:border-box">
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">현재 나이</label>
+        <input type="number" id="score-age" value="35" min="20" max="65" oninput="calcRetirementScore()"
+          style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:15px;color:var(--text);font-family:var(--mono);box-sizing:border-box">
+      </div>
+    </div>
+
+    <!-- 점수 게이지 -->
+    <div style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:12px;color:var(--text3)">노후 준비 점수</span>
+        <span style="font-size:18px;font-weight:800;font-family:var(--mono)" id="score-val">—</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:10px;height:24px;position:relative;overflow:hidden">
+        <div id="score-bar" style="height:100%;width:0%;border-radius:10px;transition:width 0.6s ease;background:linear-gradient(90deg,#e85555,#ffb432,#34c97a)"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:4px">
+        <span>위험 🔴</span><span>보통 🟡</span><span>양호 🟢</span><span>우수 💎</span>
+      </div>
+    </div>
+
+    <!-- 등급 결과 -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">
+      <div style="background:var(--bg3);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">전국 상위</div>
+        <div style="font-size:22px;font-weight:800;font-family:var(--mono)" id="score-rank">—</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">65세 예상 연금자산</div>
+        <div style="font-size:16px;font-weight:700;color:var(--irp);font-family:var(--mono)" id="score-proj">—</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">월 수령 가능액</div>
+        <div style="font-size:16px;font-weight:700;color:var(--isa);font-family:var(--mono)" id="score-monthly-recv">—</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">한 줄 평가</div>
+        <div style="font-size:13px;font-weight:700;" id="score-comment">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 섹션3: 준비한 사람 vs 안 한 사람 ── -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px">
+    <h3 style="font-size:15px;font-weight:700;color:var(--text);margin:0 0 6px">⚔️ 준비한 사람 VS 안 한 사람</h3>
+    <p style="font-size:12px;color:var(--text3);margin:0 0 20px">25년 후 두 사람의 자산 격차 — 복리와 인플레이션이 만드는 냉혹한 현실</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px">
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">월 투자액 (만원)</label>
+        <input type="text" id="gap-monthly" value="50" inputmode="numeric" class="comma-input" data-calc="calcGapChart"
+          style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:15px;color:var(--text);font-family:var(--mono);box-sizing:border-box">
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">연 기대수익률 <span id="gap-rate-lbl" style="color:var(--irp);font-weight:700">8%</span></label>
+        <input type="range" id="gap-rate" min="3" max="15" step="0.5" value="8" oninput="calcGapChart()"
+          style="width:100%;accent-color:var(--irp)">
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">인플레이션 <span id="gap-inf-lbl" style="color:#e85555;font-weight:700">3%</span></label>
+        <input type="range" id="gap-inf" min="1" max="6" step="0.5" value="3" oninput="calcGapChart()"
+          style="width:100%;accent-color:#e85555">
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">기간</label>
+        <div style="display:flex;gap:6px">
+          <button class="gap-yr-btn active" data-yr="25" onclick="setGapYear(25)" style="flex:1;padding:8px;border-radius:8px;font-size:12px;border:1px solid rgba(52,201,122,0.4);background:rgba(52,201,122,0.15);color:var(--irp);cursor:pointer">25년</button>
+          <button class="gap-yr-btn" data-yr="20" onclick="setGapYear(20)" style="flex:1;padding:8px;border-radius:8px;font-size:12px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer">20년</button>
+          <button class="gap-yr-btn" data-yr="30" onclick="setGapYear(30)" style="flex:1;padding:8px;border-radius:8px;font-size:12px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer">30년</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 격차 요약 카드 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+      <div style="background:rgba(52,201,122,0.08);border:1px solid rgba(52,201,122,0.3);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">✅ A (투자한 사람)</div>
+        <div style="font-size:20px;font-weight:800;color:var(--irp);font-family:var(--mono)" id="gap-a-val">—</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px">복리 투자</div>
+      </div>
+      <div style="background:rgba(232,85,85,0.08);border:1px solid rgba(232,85,85,0.3);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">❌ B (안 한 사람)</div>
+        <div style="font-size:20px;font-weight:800;color:#e85555;font-family:var(--mono)" id="gap-b-val">—</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px">인플레이션 잠식</div>
+      </div>
+      <div style="background:rgba(255,180,50,0.08);border:1px solid rgba(255,180,50,0.3);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">💥 자산 격차</div>
+        <div style="font-size:20px;font-weight:800;color:#ffb432;font-family:var(--mono)" id="gap-diff-val">—</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px" id="gap-diff-x">—</div>
+      </div>
+    </div>
+
+    <!-- 격차 차트 -->
+    <canvas id="chart-gap" height="220"></canvas>
+
+    <!-- 인사이트 문구 -->
+    <div id="gap-insight" style="margin-top:14px;background:rgba(255,180,50,0.06);border-left:3px solid #ffb432;border-radius:0 8px 8px 0;padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.8"></div>
+  </div>
+
+
+  <!-- ══ 기능 1+2: 내 위치 & 노후 준비 점수 ══ -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px">
+    <h3 style="font-size:15px;font-weight:700;color:var(--text);margin:0 0 6px">🎯 나의 노후 준비 점수 — 대한민국 상위 몇 %?</h3>
+    <p style="font-size:12px;color:var(--text3);margin:0 0 20px">월 저축액과 현재 자산을 입력하면 통계청 데이터 기반으로 내 위치를 보여드려요</p>
+
+    <!-- 입력 -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px">
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">월 저축·투자액 (만원)</label>
+        <input type="text" id="rank-saving" value="50" inputmode="numeric" class="comma-input" data-calc="calcMyRank"
+          style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:15px;color:var(--text);font-family:var(--mono);box-sizing:border-box">
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">현재 순자산 (만원)</label>
+        <input type="text" id="rank-asset" value="30000" inputmode="numeric" class="comma-input" data-calc="calcMyRank"
+          style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:15px;color:var(--text);font-family:var(--mono);box-sizing:border-box">
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">나이</label>
+        <input type="number" id="rank-age" value="35" min="20" max="70" oninput="calcMyRank()"
+          style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:15px;color:var(--text);font-family:var(--mono);box-sizing:border-box">
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">연금계좌 보유 여부</label>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <button onclick="setPension(true)" id="btn-pension-y" style="flex:1;padding:9px;border-radius:8px;font-size:12px;border:1px solid rgba(52,201,122,0.4);background:rgba(52,201,122,0.15);color:var(--irp);cursor:pointer;font-family:var(--sans)">✅ 있음</button>
+          <button onclick="setPension(false)" id="btn-pension-n" style="flex:1;padding:9px;border-radius:8px;font-size:12px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--sans)">❌ 없음</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 점수 & 피라미드 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center">
+
+      <!-- 왼쪽: 점수 카드 -->
+      <div>
+        <div style="display:grid;gap:10px">
+          <div style="background:var(--bg3);border-radius:12px;padding:16px;text-align:center">
+            <div style="font-size:12px;color:var(--text3);margin-bottom:6px">노후 준비 점수</div>
+            <div style="font-size:42px;font-weight:900;font-family:var(--mono);line-height:1" id="rank-score">—</div>
+            <div style="font-size:13px;font-weight:700;margin-top:6px" id="rank-grade">—</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="background:var(--bg3);border-radius:10px;padding:12px;text-align:center">
+              <div style="font-size:11px;color:var(--text3);margin-bottom:4px">자산 순위</div>
+              <div style="font-size:18px;font-weight:700;font-family:var(--mono)" id="rank-asset-pct">—</div>
+            </div>
+            <div style="background:var(--bg3);border-radius:10px;padding:12px;text-align:center">
+              <div style="font-size:11px;color:var(--text3);margin-bottom:4px">저축 순위</div>
+              <div style="font-size:18px;font-weight:700;font-family:var(--mono)" id="rank-saving-pct">—</div>
+            </div>
+          </div>
+          <div style="background:var(--bg3);border-radius:10px;padding:12px">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:6px">동나이대 평균 대비</div>
+            <div style="font-size:13px;font-weight:600" id="rank-vs-avg">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 오른쪽: 피라미드 -->
+      <div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:12px;text-align:center">대한민국 노후준비 피라미드</div>
+        <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:3px">
+          <!-- 피라미드 레이어 -->
+          <div class="pyramid-layer" id="pyr-1" style="width:30%;background:rgba(232,85,85,0.15);border:1px solid rgba(232,85,85,0.4);border-radius:6px;padding:6px;text-align:center;transition:all 0.3s">
+            <div style="font-size:10px;color:#e85555;font-weight:700">상위 10%</div>
+            <div style="font-size:9px;color:var(--text3)">월 150만↑ · 5억↑</div>
+          </div>
+          <div class="pyramid-layer" id="pyr-2" style="width:50%;background:rgba(255,180,50,0.1);border:1px solid rgba(255,180,50,0.3);border-radius:6px;padding:6px;text-align:center;transition:all 0.3s">
+            <div style="font-size:10px;color:#ffb432;font-weight:700">상위 11~30%</div>
+            <div style="font-size:9px;color:var(--text3)">월 80~150만 · 2~5억</div>
+          </div>
+          <div class="pyramid-layer" id="pyr-3" style="width:70%;background:rgba(52,201,122,0.08);border:1px solid rgba(52,201,122,0.25);border-radius:6px;padding:6px;text-align:center;transition:all 0.3s">
+            <div style="font-size:10px;color:var(--irp);font-weight:700">상위 31~60%</div>
+            <div style="font-size:9px;color:var(--text3)">월 30~80만 · 5천~2억</div>
+          </div>
+          <div class="pyramid-layer" id="pyr-4" style="width:85%;background:rgba(61,142,240,0.08);border:1px solid rgba(61,142,240,0.2);border-radius:6px;padding:6px;text-align:center;transition:all 0.3s">
+            <div style="font-size:10px;color:var(--isa);font-weight:700">하위 61~80%</div>
+            <div style="font-size:9px;color:var(--text3)">월 10~30만 · 1천~5천</div>
+          </div>
+          <div class="pyramid-layer" id="pyr-5" style="width:100%;background:rgba(150,150,150,0.08);border:1px solid rgba(150,150,150,0.2);border-radius:6px;padding:6px;text-align:center;transition:all 0.3s">
+            <div style="font-size:10px;color:var(--text3);font-weight:700">하위 80%↓</div>
+            <div style="font-size:9px;color:var(--text3)">준비 안 됨 · 국민연금만</div>
+          </div>
+          <!-- 내 위치 화살표 -->
+          <div id="pyr-arrow" style="position:absolute;right:-8px;font-size:12px;color:#ffb432;font-weight:700;transition:top 0.4s;top:0">← 나</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 한줄 코멘트 -->
+    <div style="margin-top:16px;padding:12px 16px;border-radius:10px;border:1px solid var(--border)" id="rank-comment" style="font-size:13px"></div>
+  </div>
+
+  <!-- ══ 기능 3: 준비한 사람 vs 아닌 사람 복리 시뮬레이션 ══ -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px">
+    <h3 style="font-size:15px;font-weight:700;color:var(--text);margin:0 0 6px">⚔️ 준비한 사람 VS 안 한 사람 — 25년 후 격차</h3>
+    <p style="font-size:12px;color:var(--text3);margin:0 0 20px">같은 출발선, 다른 선택 — 복리와 인플레이션이 만드는 충격적인 격차</p>
+
+    <!-- 입력 -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px">
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">월 투자액 A (만원)</label>
+        <input type="text" id="gap-monthly" value="50" inputmode="numeric" class="comma-input" data-calc="calcGapSim"
+          style="width:100%;background:var(--bg3);border:1px solid rgba(52,201,122,0.3);border-radius:8px;padding:10px 12px;font-size:15px;color:var(--irp);font-family:var(--mono);box-sizing:border-box">
+        <div style="font-size:10px;color:var(--text3);margin-top:3px">A: 연금계좌 투자</div>
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">연 수익률 (A)</label>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="range" id="gap-rate" min="3" max="15" step="0.5" value="8" oninput="calcGapSim()"
+            style="flex:1;accent-color:var(--irp)">
+          <span id="gap-rate-label" style="font-size:13px;font-weight:700;color:var(--irp);min-width:36px">8%</span>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">인플레이션율 (B)</label>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="range" id="gap-inflation" min="1" max="6" step="0.5" value="3" oninput="calcGapSim()"
+            style="flex:1;accent-color:#e85555">
+          <span id="gap-inflation-label" style="font-size:13px;font-weight:700;color:#e85555;min-width:36px">3%</span>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">기간</label>
+        <div style="display:flex;gap:6px">
+          <button onclick="setGapYears(10)" data-yr="10" style="flex:1;padding:8px;border-radius:7px;font-size:11px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--sans)">10년</button>
+          <button onclick="setGapYears(25)" data-yr="25" style="flex:1;padding:8px;border-radius:7px;font-size:11px;border:1px solid rgba(52,201,122,0.4);background:rgba(52,201,122,0.12);color:var(--irp);cursor:pointer;font-family:var(--sans)">25년</button>
+          <button onclick="setGapYears(35)" data-yr="35" style="flex:1;padding:8px;border-radius:7px;font-size:11px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--sans)">35년</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 결과 카드 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px">
+      <div style="background:rgba(52,201,122,0.08);border:1px solid rgba(52,201,122,0.3);border-radius:12px;padding:14px;text-align:center">
+        <div style="font-size:11px;color:var(--irp);font-weight:600;margin-bottom:6px">✅ A (투자한 사람)</div>
+        <div style="font-size:22px;font-weight:800;color:var(--irp);font-family:var(--mono)" id="gap-a-val">—</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px" id="gap-a-sub">—</div>
+      </div>
+      <div style="background:rgba(232,85,85,0.08);border:1px solid rgba(232,85,85,0.3);border-radius:12px;padding:14px;text-align:center">
+        <div style="font-size:11px;color:#e85555;font-weight:600;margin-bottom:6px">❌ B (그냥 쓴 사람)</div>
+        <div style="font-size:22px;font-weight:800;color:#e85555;font-family:var(--mono)" id="gap-b-val">—</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px" id="gap-b-sub">—</div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(52,201,122,0.1),rgba(232,85,85,0.1));border:1px solid rgba(255,180,50,0.4);border-radius:12px;padding:14px;text-align:center">
+        <div style="font-size:11px;color:#ffb432;font-weight:600;margin-bottom:6px">🔥 격차</div>
+        <div style="font-size:22px;font-weight:800;color:#ffb432;font-family:var(--mono)" id="gap-diff-val">—</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px" id="gap-diff-sub">—</div>
+      </div>
+    </div>
+
+    <!-- 양극화 막대 차트 -->
+    <canvas id="chart-gap-sim" height="180"></canvas>
+
+    <!-- 충격 메시지 -->
+    <div style="margin-top:16px;padding:14px 16px;background:rgba(255,180,50,0.06);border:1px solid rgba(255,180,50,0.25);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.8" id="gap-message"></div>
+  </div>
+
+  <!-- 주요 통계 출처 -->
+  <div style="font-size:11px;color:var(--text3);text-align:center;padding:8px">
+    📊 출처: 국가데이터처 가계금융복지조사(2025), 한국은행 BOK이슈노트(2026), 고용노동부 임금구조기본통계(2024) · 참고용 데이터입니다
+  </div>
+
+</div>
+</div><!-- /page-inequality -->
+
 
 
 <!-- ══════════════ 맞춤 ETF 추천 페이지 ══════════════ -->
@@ -3694,6 +4399,7 @@ function restoreTheme() {
 document.addEventListener('DOMContentLoaded', function() {
   restoreTheme();
   initAuth();
+  setTimeout(initCommaInputs, 300);
 
   function on(id, ev, fn) {
     var el = document.getElementById(id);
@@ -4249,6 +4955,7 @@ function showPage(name) {
   if (name === 'planner')   { /* 계산기는 이미 초기화됨 */ }
   if (name === 'goalcalc')  { calcGoal(); }
   if (name === 'childplan') { calcChildPlan(); }
+  if (name === 'inequality') { initInequalityCharts(); calcMyPosition(); calcMyRank(); calcGapSim(); initCommaInputs(); }
   if (name === 'etfrec')    { renderMacroRec(); }
 }
 
@@ -4278,6 +4985,7 @@ function showSubTab(page, sub) {
   if (page === 'market'  && sub === 'dividend') { renderDivCalendar(); setTimeout(loadDivSheetData, 300); }
   if (page === 'market'  && sub === 'etfdiv')   renderEtfDivCalendar();
   if (page === 'market'  && sub === 'stocks')   initStocksPage();
+  if (page === 'insight' && sub === 'global')    { calc401k(); initCommaInputs(); }
 }
 
 function switchTab(name) {
@@ -7777,8 +8485,8 @@ function setChildAge(age) {
 }
 
 function calcChildPlan() {
-  const gift1 = parseFloat(document.getElementById('child-gift1')?.value) || 2000;
-  const gift2 = parseFloat(document.getElementById('child-gift2')?.value) || 2000;
+  const gift1 = getRawNumber(document.getElementById('child-gift1')) || 2000;
+  const gift2 = getRawNumber(document.getElementById('child-gift2')) || 2000;
   const rateEl = document.getElementById('child-rate');
   const rate   = rateEl ? parseFloat(rateEl.value) / 100 : 0.10;
 
@@ -7817,6 +8525,818 @@ function calcChildPlan() {
   set('child-tl-20yr', '약 ' + fmt(Math.round(2000 * Math.pow(1.10, 20))));
   set('child-tl-9yr',  '약 ' + fmt(Math.round(2000 * Math.pow(1.10, 9))));
   set('child-tl-total','약 ' + fmt(Math.round(2000 * Math.pow(1.10, 20) + 2000 * Math.pow(1.10, 9))));
+}
+
+/* ════════════════════════════════════════
+   양극화 대시보드
+════════════════════════════════════════ */
+var _ineqChartsInit = false;
+
+function initInequalityCharts() {
+  if (_ineqChartsInit) return;
+  _ineqChartsInit = true;
+
+  const CHART_OPTS = {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8892a4', font: { size: 10 } } },
+      y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8892a4', font: { size: 10 } } }
+    }
+  };
+
+  // ── 1. 자산 분포 차트 ──
+  const ctx1 = document.getElementById('chart-asset-dist');
+  if (ctx1) {
+    new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: ['하위10%','하위20%','중하위30%','중위40%','중상위50%','상위30%','상위20%','상위10%','상위5%','상위1%'],
+        datasets: [{
+          data: [0.2, 0.8, 1.8, 3.2, 5.6, 9.8, 14.2, 22.1, 18.5, 23.8],
+          backgroundColor: ctx1 => {
+            const v = [0.2,0.8,1.8,3.2,5.6,9.8,14.2,22.1,18.5,23.8][ctx1.dataIndex];
+            return v > 15 ? 'rgba(232,85,85,0.8)' : v > 8 ? 'rgba(255,180,50,0.7)' : 'rgba(61,142,240,0.6)';
+          },
+          borderRadius: 6,
+        }]
+      },
+      options: { ...CHART_OPTS, plugins: { ...CHART_OPTS.plugins,
+        tooltip: { callbacks: { label: ctx => ctx.raw + '%' } }
+      }}
+    });
+  }
+
+  // ── 2. 소득 분위별 임금 차트 ──
+  const ctx2 = document.getElementById('chart-income-dist');
+  if (ctx2) {
+    new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: ['1분위','2분위','3분위','4분위','5분위','6분위','7분위','8분위','9분위','10분위'],
+        datasets: [{
+          data: [105, 172, 224, 272, 321, 378, 445, 532, 668, 1150],
+          backgroundColor: (ctx) => {
+            const idx = ctx.dataIndex;
+            const colors = ['#3d8ef0','#3d8ef0','#3d8ef0','#34c97a','#34c97a','#34c97a','#ffb432','#ffb432','#e85555','#e85555'];
+            return colors[idx] + 'cc';
+          },
+          borderRadius: 6,
+        }]
+      },
+      options: { ...CHART_OPTS, plugins: { ...CHART_OPTS.plugins,
+        tooltip: { callbacks: { label: ctx => ctx.raw.toLocaleString() + '만원' } }
+      }}
+    });
+  }
+
+  // ── 3. 세대별 순자산 차트 ──
+  const ctx3 = document.getElementById('chart-generation');
+  if (ctx3) {
+    new Chart(ctx3, {
+      type: 'bar',
+      data: {
+        labels: ['20대','30대','40대','50대','60대','70대+'],
+        datasets: [{
+          label: '평균 순자산(만원)',
+          data: [4800, 21500, 41200, 56800, 71400, 52000],
+          backgroundColor: ['rgba(61,142,240,0.5)','rgba(61,142,240,0.7)','rgba(52,201,122,0.7)','rgba(255,180,50,0.7)','rgba(232,85,85,0.8)','rgba(201,123,240,0.7)'],
+          borderRadius: 6,
+        }]
+      },
+      options: { ...CHART_OPTS, plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ctx.raw.toLocaleString() + '만원' } }
+      }}
+    });
+  }
+
+  // ── 4. PIR (주택가격/소득 배율) 추이 ──
+  const ctx4 = document.getElementById('chart-pir');
+  if (ctx4) {
+    new Chart(ctx4, {
+      type: 'line',
+      data: {
+        labels: ['2010','2012','2014','2016','2018','2019','2020','2021','2022','2023','2024','2025'],
+        datasets: [{
+          label: '서울 PIR',
+          data: [8.2, 8.9, 9.1, 10.3, 12.8, 14.1, 16.8, 19.2, 17.4, 16.1, 17.3, 18.1],
+          borderColor: '#e85555',
+          backgroundColor: 'rgba(232,85,85,0.1)',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#e85555',
+          pointRadius: 4,
+        },{
+          label: '전국 PIR',
+          data: [5.1, 5.4, 5.2, 5.8, 7.1, 7.8, 9.2, 11.3, 9.8, 8.9, 9.2, 9.6],
+          borderColor: '#ffb432',
+          backgroundColor: 'rgba(255,180,50,0.05)',
+          fill: false,
+          tension: 0.4,
+          pointBackgroundColor: '#ffb432',
+          pointRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: true, labels: { color: '#8892a4', font: { size: 11 } } },
+          tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + ctx.raw + '배' } }
+        },
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8892a4', font: { size: 10 } } },
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8892a4', font: { size: 10 }, callback: v => v + '배' } }
+        }
+      }
+    });
+  }
+}
+
+/* ── 내 위치 계산기 ── */
+function calcMyPosition() {
+  const income = getRawNumber(document.getElementById('ineq-income')) || 350;
+  const asset  = getRawNumber(document.getElementById('ineq-asset'))  || 15000;
+  const age    = parseInt(document.getElementById('ineq-age')?.value)       || 35;
+
+  // 소득 분위 계산 (2023 통계청 기준)
+  const incomeBreaks = [0,98,163,213,258,305,358,421,503,632,900,9999];
+  let incomeTier = 1;
+  for (let i = 1; i < incomeBreaks.length; i++) {
+    if (income >= incomeBreaks[i-1]) incomeTier = i;
+  }
+  const incomeTierLabel = incomeTier <= 3 ? '하위' : incomeTier <= 5 ? '중하위' : incomeTier <= 7 ? '중위' : incomeTier <= 9 ? '상위' : '최상위';
+  const incomeTierColor = incomeTier <= 3 ? 'var(--isa)' : incomeTier <= 6 ? 'var(--irp)' : incomeTier <= 8 ? '#ffb432' : '#e85555';
+
+  // 자산 분위 계산 (2023 가계금융복지조사)
+  const assetBreaks = [0,500,2000,6000,12000,20000,35000,60000,100000,200000,9999999];
+  let assetTier = 1;
+  for (let i = 1; i < assetBreaks.length; i++) {
+    if (asset >= assetBreaks[i-1]) assetTier = i;
+  }
+  const assetTierLabel = assetTier <= 2 ? '하위' : assetTier <= 4 ? '중하위' : assetTier <= 6 ? '중위' : assetTier <= 8 ? '상위' : '최상위';
+  const assetTierColor = assetTier <= 3 ? 'var(--isa)' : assetTier <= 5 ? 'var(--irp)' : assetTier <= 7 ? '#ffb432' : '#e85555';
+
+  // 연령대별 평균 자산
+  const ageAvgMap = { 20:4200, 30:19800, 40:38500, 50:52300, 60:64700, 70:48200 };
+  const ageKey = Math.floor(age/10)*10;
+  const ageAvg = ageAvgMap[Math.min(Math.max(ageKey,20),70)] || 19800;
+  const ageDiff = asset - ageAvg;
+  const ageDiffStr = (ageDiff >= 0 ? '+' : '') + Math.round(ageDiff).toLocaleString() + '만원';
+  const ageDiffColor = ageDiff >= 0 ? 'var(--irp)' : '#e85555';
+
+  // 종합 판정
+  let verdict, action, verdictColor;
+  if (incomeTier >= 8 && assetTier >= 7) {
+    verdict = '🏆 상위 계층'; action = '자산 유지·증식 전략'; verdictColor = '#ffb432';
+  } else if (incomeTier >= 6 && assetTier >= 5) {
+    verdict = '📈 중상위 계층'; action = '연금+ETF 집중 투자'; verdictColor = 'var(--irp)';
+  } else if (incomeTier >= 4 && assetTier >= 3) {
+    verdict = '🎯 중산층'; action = 'IRP·ISA 한도 먼저 채우기'; verdictColor = 'var(--isa)';
+  } else {
+    verdict = '⚡ 집중 성장 필요'; action = '절세계좌+ETF 즉시 시작'; verdictColor = '#e85555';
+  }
+
+  // 결과 업데이트
+  const set = (id, val, color) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = val;
+    if (color) el.style.color = color;
+  };
+  set('ineq-res-income-tier', incomeTier + '분위', incomeTierColor);
+  set('ineq-res-income-desc', incomeTierLabel + ' (' + income.toLocaleString() + '만원/월)');
+  set('ineq-res-asset-tier',  assetTier + '분위', assetTierColor);
+  set('ineq-res-asset-desc',  assetTierLabel + ' (' + Math.round(asset/10000*10)/10 + '억)');
+  set('ineq-res-age-avg',     ageAvg.toLocaleString() + '만원');
+  set('ineq-res-age-diff',    '동나이대 대비 ' + ageDiffStr, ageDiffColor);
+  set('ineq-res-verdict',     verdict, verdictColor);
+  set('ineq-res-action',      action);
+
+  // 소득 바 마커 위치 업데이트
+  const marker = document.getElementById('ineq-income-marker');
+  if (marker) {
+    const pct = Math.min(Math.max((income - 98) / (900 - 98), 0), 1) * 100;
+    marker.style.left = pct + '%';
+  }
+}
+
+/* ════════════════════════════════════════
+   숫자 입력 자동 콤마 포맷
+════════════════════════════════════════ */
+function applyCommaFormat(el) {
+  // 커서 위치 저장
+  const sel = el.selectionStart;
+  const raw = el.value.replace(/,/g, '');
+  if (raw === '' || isNaN(raw)) return;
+  const formatted = Number(raw).toLocaleString('ko-KR');
+  if (el.value !== formatted) {
+    el.value = formatted;
+    // 콤마 추가로 늘어난 길이만큼 커서 보정
+    const diff = formatted.length - el.value.length + (formatted.length - raw.length);
+    try { el.setSelectionRange(sel + (formatted.length - raw.replace(/,/g,'').length), sel + (formatted.length - raw.replace(/,/g,'').length)); } catch(e) {}
+  }
+}
+
+function getRawNumber(el) {
+  if (!el) return 0;
+  return parseFloat(el.value.replace(/,/g, '')) || 0;
+}
+
+// 모든 콤마 입력 필드 초기화
+function initCommaInputs() {
+  document.querySelectorAll('.comma-input').forEach(el => {
+    el.addEventListener('input', function() {
+      const pos = this.selectionStart;
+      const oldLen = this.value.length;
+      const raw = this.value.replace(/[^0-9]/g, '');
+      if (raw === '') return;
+      const formatted = Number(raw).toLocaleString('ko-KR');
+      this.value = formatted;
+      const newLen = formatted.length;
+      const newPos = pos + (newLen - oldLen);
+      try { this.setSelectionRange(newPos, newPos); } catch(e) {}
+      // 연결된 계산 함수 실행
+      const fn = this.dataset.calc;
+      if (fn && window[fn]) window[fn]();
+    });
+    // 초기값 포맷
+    const init = el.value.replace(/,/g, '');
+    if (init && !isNaN(init)) el.value = Number(init).toLocaleString('ko-KR');
+  });
+}
+
+/* ════════════════════════════════════════
+   양극화 - 피라미드 / 점수 / 격차 차트
+════════════════════════════════════════ */
+
+/* ── 피라미드 계산 ── */
+function calcPyramid() {
+  const asset  = getRawNumber(document.getElementById('pyr-asset'))  || 30000;
+  const income = getRawNumber(document.getElementById('pyr-income')) || 350;
+
+  // 순자산 분위 구간 (통계청 가계금융복지조사 2025 기준, 만원)
+  const tiers = [
+    { label:'상위 1%',  min:150000, pct:1,   color:'#e85555', count:26 },
+    { label:'상위 5%',  min:80000,  pct:5,   color:'#e8774d', count:130 },
+    { label:'상위 10%', min:50000,  pct:10,  color:'#ffb432', count:260 },
+    { label:'상위 20%', min:28000,  pct:20,  color:'#f0d050', count:520 },
+    { label:'상위 30%', min:18000,  pct:30,  color:'#a0c878', count:780 },
+    { label:'상위 50%', min:9000,   pct:50,  color:'#34c97a', count:1300 },
+    { label:'하위 50%', min:0,      pct:100, color:'#3d8ef0', count:1300 },
+  ];
+
+  // 내 위치 찾기
+  let myTier = tiers[tiers.length - 1];
+  let nextTier = null;
+  for (let i = 0; i < tiers.length; i++) {
+    if (asset >= tiers[i].min) {
+      myTier = tiers[i];
+      nextTier = i > 0 ? tiers[i-1] : null;
+      break;
+    }
+  }
+
+  // 피라미드 렌더링
+  const wrap = document.getElementById('pyramid-wrap');
+  if (wrap) {
+    const totalH = 280;
+    wrap.innerHTML = tiers.map((t, i) => {
+      const widthPct = 20 + (i / (tiers.length-1)) * 75;
+      const isMe = t.label === myTier.label;
+      return `<div style="
+        width:${widthPct}%;height:${totalH/tiers.length - 2}px;
+        background:${isMe ? t.color : t.color+'55'};
+        border-radius:4px;display:flex;align-items:center;justify-content:center;
+        font-size:${isMe?'12':'10'}px;font-weight:${isMe?'700':'400'};
+        color:${isMe?'#fff':'rgba(255,255,255,0.6)'};
+        border:${isMe?'2px solid #fff':'1px solid transparent'};
+        position:relative;transition:all 0.3s;
+        ${isMe?'box-shadow:0 0 12px '+t.color+'88;':''}"
+      >
+        ${isMe?'👈 ':''} ${t.label}
+        ${isMe?`<span style="margin-left:8px;font-size:10px;opacity:0.85">${asset.toLocaleString()}만원</span>`:''}
+      </div>`;
+    }).join('');
+  }
+
+  // 결과 텍스트
+  const set = (id, val, color) => { const el = document.getElementById(id); if(el){el.textContent=val; if(color)el.style.color=color;} };
+  set('pyr-pct', myTier.pct + '%', myTier.color);
+  set('pyr-tier-label', myTier.label + ' 수준');
+
+  const totalHH = 25980000; // 전국 가구 수 (약 2598만)
+  const ahead = Math.round(totalHH * (myTier.pct / 100));
+  set('pyr-ahead', ahead.toLocaleString() + '가구');
+
+  if (nextTier) {
+    const diff = nextTier.min - asset;
+    set('pyr-next', diff > 0 ? diff.toLocaleString() + '만원' : '이미 달성!', 'var(--irp)');
+  } else {
+    set('pyr-next', '최상위 달성! 🏆', '#ffb432');
+  }
+}
+
+/* ── 노후 준비 점수 ── */
+function calcRetirementScore() {
+  const monthly = getRawNumber(document.getElementById('score-monthly')) || 50;
+  const pension  = getRawNumber(document.getElementById('score-pension'))  || 0;
+  const age      = parseInt(document.getElementById('score-age')?.value)   || 35;
+  const yearsLeft = Math.max(1, 65 - age);
+
+  // 65세까지 복리 투자 (연 8%)
+  const rate = 0.08;
+  const mr = rate / 12;
+  const n = yearsLeft * 12;
+  const futureMonthly = monthly * ((Math.pow(1+mr,n)-1)/mr) * (1+mr);
+  const futurePension  = pension * Math.pow(1+rate, yearsLeft);
+  const total = futureMonthly + futurePension;
+
+  // 월 수령액 (20년 수령 가정)
+  const monthlyRecv = Math.round(total / (20 * 12));
+
+  // 점수 계산 (통계청 기준 동나이대 노후 준비 분포)
+  // 월 저축 기준: 상위 분포
+  const savingBreaks = [0,10,20,30,50,80,120,200];
+  let savingScore = 0;
+  for (let i=0; i<savingBreaks.length; i++) {
+    if (monthly >= savingBreaks[i]) savingScore = (i/savingBreaks.length)*60;
+  }
+  // 자산 기준
+  const assetTarget = age * 1000; // 나이 * 1000만원이 목표
+  const assetScore = Math.min(40, (pension / assetTarget) * 40);
+  const totalScore = Math.min(100, Math.round(savingScore + assetScore));
+
+  // 전국 상위 %
+  const rankPct = totalScore >= 90 ? '상위 5%' : totalScore >= 75 ? '상위 15%' :
+                  totalScore >= 60 ? '상위 30%' : totalScore >= 40 ? '상위 50%' :
+                  totalScore >= 20 ? '하위 40%' : '하위 20%';
+  const rankColor = totalScore >= 75 ? 'var(--irp)' : totalScore >= 50 ? '#ffb432' : '#e85555';
+
+  const comment = totalScore >= 90 ? '🏆 완벽해요! 노후 걱정 없어요' :
+                  totalScore >= 75 ? '💚 양호해요! 조금만 더 하면 완벽' :
+                  totalScore >= 50 ? '🟡 보통이에요. 지금부터 늘려야 해요' :
+                  totalScore >= 25 ? '🔴 위험해요. 지금 바로 시작하세요!' :
+                  '⚠️ 매우 위험. 즉시 행동이 필요해요';
+  const commentColor = totalScore >= 75 ? 'var(--irp)' : totalScore >= 50 ? '#ffb432' : '#e85555';
+
+  const fmt = n => Math.round(n).toLocaleString('ko-KR') + '만원';
+  const set = (id, val, color) => { const el=document.getElementById(id); if(el){el.textContent=val; if(color)el.style.color=color;} };
+
+  set('score-val', totalScore + '점', rankColor);
+  set('score-rank', rankPct, rankColor);
+  set('score-proj', fmt(Math.round(total)));
+  set('score-monthly-recv', fmt(monthlyRecv) + '/월');
+  set('score-comment', comment, commentColor);
+
+  const bar = document.getElementById('score-bar');
+  if (bar) bar.style.width = totalScore + '%';
+}
+
+/* ── 준비 vs 미준비 격차 차트 ── */
+var _gapChart = null;
+var _gapYear  = 25;
+
+function setGapYear(yr) {
+  _gapYear = yr;
+  document.querySelectorAll('.gap-yr-btn').forEach(b => {
+    const isMe = parseInt(b.dataset.yr) === yr;
+    b.style.background = isMe ? 'rgba(52,201,122,0.15)' : 'transparent';
+    b.style.color = isMe ? 'var(--irp)' : 'var(--text2)';
+    b.style.borderColor = isMe ? 'rgba(52,201,122,0.4)' : 'var(--border2)';
+  });
+  calcGapChart();
+}
+
+function calcGapChart() {
+  const monthly = getRawNumber(document.getElementById('gap-monthly')) || 50;
+  const rateEl  = document.getElementById('gap-rate');
+  const infEl   = document.getElementById('gap-inf');
+  const rate    = rateEl ? parseFloat(rateEl.value)/100 : 0.08;
+  const inf     = infEl  ? parseFloat(infEl.value)/100  : 0.03;
+  const years   = _gapYear || 25;
+
+  // 라벨 업데이트
+  const rl = document.getElementById('gap-rate-lbl');
+  const il = document.getElementById('gap-inf-lbl');
+  if (rl) rl.textContent = (rate*100).toFixed(1) + '%';
+  if (il) il.textContent = (inf*100).toFixed(1) + '%';
+
+  const labels = [];
+  const dataA  = []; // 투자한 사람 (복리)
+  const dataB  = []; // 안 한 사람 (인플레이션 잠식)
+  const totalPrincipal = monthly * 12; // 연간 저축 원금
+
+  for (let y = 0; y <= years; y++) {
+    labels.push(y + '년');
+    // A: 월 복리 적립
+    const mr = rate / 12;
+    const n  = y * 12;
+    const aVal = n === 0 ? 0 : monthly * ((Math.pow(1+mr,n)-1)/mr) * (1+mr);
+    dataA.push(Math.round(aVal / 10000 * 10) / 10); // 억 단위
+
+    // B: 같은 금액을 현금으로 보유시 인플레이션으로 실질가치 하락
+    const bPrincipal = monthly * y * 12; // 명목 원금
+    const bReal = bPrincipal / Math.pow(1+inf, y); // 실질가치
+    dataB.push(Math.round(bReal / 10000 * 10) / 10);
+  }
+
+  const finalA = dataA[years];
+  const finalB = dataB[years];
+  const diff   = finalA - finalB;
+  const xTimes = finalB > 0 ? (finalA / finalB).toFixed(1) : '∞';
+
+  const fmt2 = v => (v*10000).toLocaleString('ko-KR') + '만원';
+  const set = (id, val, color) => { const el=document.getElementById(id); if(el){el.textContent=val; if(color)el.style.color=color;} };
+  set('gap-a-val',    fmt2(finalA), 'var(--irp)');
+  set('gap-b-val',    fmt2(finalB), '#e85555');
+  set('gap-diff-val', fmt2(diff),   '#ffb432');
+  set('gap-diff-x',   xTimes + '배 차이');
+
+  // 인사이트 문구
+  const ins = document.getElementById('gap-insight');
+  if (ins) ins.innerHTML = `
+    매달 <strong style="color:var(--irp)">${monthly.toLocaleString()}만원</strong>을 ${years}년간 투자한 사람은 <strong style="color:var(--irp)">${fmt2(finalA)}</strong>을 만들었습니다.<br>
+    같은 돈을 그냥 쓴 사람의 현금 실질가치는 <strong style="color:#e85555">${fmt2(finalB)}</strong>으로 쪼그라들었어요.<br>
+    두 사람의 격차는 <strong style="color:#ffb432">${fmt2(diff)}</strong> — 이것이 바로 <strong>노후 양극화</strong>입니다.
+  `;
+
+  // 차트 렌더링
+  const ctx = document.getElementById('chart-gap');
+  if (!ctx) return;
+  if (_gapChart) { _gapChart.destroy(); _gapChart = null; }
+
+  _gapChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'A (투자한 사람)',
+          data: dataA,
+          borderColor: '#34c97a',
+          backgroundColor: 'rgba(52,201,122,0.08)',
+          fill: true, tension: 0.4,
+          pointRadius: 0, pointHoverRadius: 5,
+          borderWidth: 2.5,
+        },
+        {
+          label: 'B (안 한 사람)',
+          data: dataB,
+          borderColor: '#e85555',
+          backgroundColor: 'rgba(232,85,85,0.06)',
+          fill: true, tension: 0.4,
+          pointRadius: 0, pointHoverRadius: 5,
+          borderWidth: 2, borderDash: [5,4],
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#8892a4', font: { size: 11 } } },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.dataset.label + ': ' + (ctx.raw*10000).toLocaleString() + '만원'
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#8892a4', font: { size: 10 }, maxTicksLimit: 10 }
+        },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#8892a4', font: { size: 10 }, callback: v => v + '억' }
+        }
+      }
+    }
+  });
+}
+
+/* ════════════════════════════════════════
+   양극화 — 노후 준비 점수 & 피라미드
+════════════════════════════════════════ */
+var _hasPension = true;
+var _gapYears = 25;
+var _gapChartObj = null;
+
+function setPension(val) {
+  _hasPension = val;
+  document.getElementById('btn-pension-y').style.background = val ? 'rgba(52,201,122,0.15)' : 'transparent';
+  document.getElementById('btn-pension-y').style.borderColor = val ? 'rgba(52,201,122,0.4)' : 'var(--border2)';
+  document.getElementById('btn-pension-y').style.color = val ? 'var(--irp)' : 'var(--text2)';
+  document.getElementById('btn-pension-n').style.background = !val ? 'rgba(232,85,85,0.12)' : 'transparent';
+  document.getElementById('btn-pension-n').style.borderColor = !val ? 'rgba(232,85,85,0.4)' : 'var(--border2)';
+  document.getElementById('btn-pension-n').style.color = !val ? '#e85555' : 'var(--text2)';
+  calcMyRank();
+}
+
+function calcMyRank() {
+  const saving = getRawNumber(document.getElementById('rank-saving')) || 50;
+  const asset  = getRawNumber(document.getElementById('rank-asset'))  || 30000;
+  const age    = parseInt(document.getElementById('rank-age')?.value) || 35;
+
+  // ── 자산 분위 (통계청 가계금융복지조사 2025 기준) ──
+  const assetBreaks = [0, 1000, 3000, 7000, 15000, 30000, 60000, 120000, 250000, 9999999];
+  let assetPct = 90;
+  if (asset >= 250000) assetPct = 2;
+  else if (asset >= 120000) assetPct = 8;
+  else if (asset >= 60000)  assetPct = 17;
+  else if (asset >= 30000)  assetPct = 30;
+  else if (asset >= 15000)  assetPct = 45;
+  else if (asset >= 7000)   assetPct = 58;
+  else if (asset >= 3000)   assetPct = 70;
+  else if (asset >= 1000)   assetPct = 82;
+  else assetPct = 93;
+
+  // ── 저축 분위 ──
+  let savingPct = 90;
+  if (saving >= 200)     savingPct = 5;
+  else if (saving >= 150) savingPct = 10;
+  else if (saving >= 100) savingPct = 18;
+  else if (saving >= 80)  savingPct = 25;
+  else if (saving >= 50)  savingPct = 35;
+  else if (saving >= 30)  savingPct = 50;
+  else if (saving >= 15)  savingPct = 65;
+  else if (saving >= 5)   savingPct = 78;
+  else savingPct = 90;
+
+  // ── 점수 계산 (자산50 + 저축30 + 연금10 + 나이보정10) ──
+  const assetScore   = Math.round((100 - assetPct) * 0.5);
+  const savingScore  = Math.round((100 - savingPct) * 0.3);
+  const pensionScore = _hasPension ? 10 : 0;
+  // 나이 대비 자산 보정
+  const ageAvgMap = {20:4800,30:21500,40:41200,50:56800,60:71400,70:52000};
+  const ageKey = Math.min(Math.max(Math.floor(age/10)*10, 20), 70);
+  const ageAvg = ageAvgMap[ageKey];
+  const ageBonus = asset >= ageAvg * 1.5 ? 10 : asset >= ageAvg ? 7 : asset >= ageAvg * 0.5 ? 4 : 0;
+  const score = Math.min(100, assetScore + savingScore + pensionScore + ageBonus);
+
+  // ── 등급 ──
+  let grade, gradeColor;
+  if (score >= 85)      { grade = '🏆 최상위 준비자'; gradeColor = '#e85555'; }
+  else if (score >= 70) { grade = '🥇 상위 준비자';   gradeColor = '#ffb432'; }
+  else if (score >= 55) { grade = '📈 평균 이상';     gradeColor = 'var(--irp)'; }
+  else if (score >= 40) { grade = '⚡ 평균 수준';     gradeColor = 'var(--isa)'; }
+  else if (score >= 25) { grade = '⚠️ 준비 부족';    gradeColor = '#ffb432'; }
+  else                  { grade = '🚨 즉시 시작 필요'; gradeColor = '#e85555'; }
+
+  // ── 피라미드 하이라이트 ──
+  const layers = ['pyr-1','pyr-2','pyr-3','pyr-4','pyr-5'];
+  const arrowTops = ['8px','54px','100px','146px','192px'];
+  let activeLayer = 4;
+  if (score >= 80)      activeLayer = 0;
+  else if (score >= 60) activeLayer = 1;
+  else if (score >= 40) activeLayer = 2;
+  else if (score >= 25) activeLayer = 3;
+  else                  activeLayer = 4;
+
+  layers.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.opacity = i === activeLayer ? '1' : '0.4';
+    el.style.transform = i === activeLayer ? 'scale(1.03)' : 'scale(1)';
+    el.style.boxShadow = i === activeLayer ? '0 0 12px rgba(255,180,50,0.3)' : 'none';
+  });
+  const arrow = document.getElementById('pyr-arrow');
+  if (arrow) arrow.style.top = arrowTops[activeLayer];
+
+  // ── 동나이대 비교 ──
+  const diff = asset - ageAvg;
+  const diffStr = (diff >= 0 ? '+' : '') + Math.round(diff).toLocaleString('ko-KR') + '만원';
+  const diffColor = diff >= 0 ? 'var(--irp)' : '#e85555';
+
+  // ── 코멘트 ──
+  let comment = '';
+  if (score >= 70) comment = `🎉 상위 ${100-assetPct}% 수준입니다. 현재 페이스 유지 시 노후 걱정 없는 수준에 도달할 가능성이 높아요.`;
+  else if (score >= 50) comment = `📊 평균 이상이지만 방심은 금물. 월 저축액을 ${Math.round(saving * 1.3)}만원으로 늘리면 상위 ${Math.max(5, 100-assetPct-15)}% 진입 가능해요.`;
+  else if (score >= 30) comment = `⚡ 지금 바로 IRP·개인연금 계좌를 열고 월 ${saving}만원부터 시작하세요. 10년 후 완전히 다른 위치에 있을 거예요.`;
+  else comment = `🚨 국민연금만으로는 노후 생활비의 40%도 충당 못 합니다. 지금 당장 월 10만원이라도 연금계좌 투자를 시작하세요.`;
+
+  // ── DOM 업데이트 ──
+  const set = (id, v, color) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = v;
+    if (color) el.style.color = color;
+  };
+
+  set('rank-score', score + '점', score >= 70 ? 'var(--irp)' : score >= 50 ? '#ffb432' : '#e85555');
+  set('rank-grade', grade, gradeColor);
+  set('rank-asset-pct', '상위 ' + assetPct + '%', assetPct <= 20 ? '#ffb432' : 'var(--text)');
+  set('rank-saving-pct', '상위 ' + savingPct + '%', savingPct <= 30 ? 'var(--irp)' : 'var(--text)');
+  set('rank-vs-avg', `동나이대(${ageKey}대) 평균 ${ageAvg.toLocaleString()}만원 대비 ${diffStr}`, diffColor);
+
+  const commentEl = document.getElementById('rank-comment');
+  if (commentEl) {
+    commentEl.textContent = comment;
+    commentEl.style.borderColor = score >= 70 ? 'rgba(52,201,122,0.3)' : score >= 40 ? 'rgba(255,180,50,0.3)' : 'rgba(232,85,85,0.3)';
+    commentEl.style.background  = score >= 70 ? 'rgba(52,201,122,0.05)' : score >= 40 ? 'rgba(255,180,50,0.05)' : 'rgba(232,85,85,0.05)';
+  }
+}
+
+/* ════════════════════════════════════════
+   양극화 — A vs B 격차 시뮬레이션
+════════════════════════════════════════ */
+function setGapYears(yr) {
+  _gapYears = yr;
+  document.querySelectorAll('[data-yr]').forEach(btn => {
+    const isActive = parseInt(btn.dataset.yr) === yr;
+    btn.style.background   = isActive ? 'rgba(52,201,122,0.12)' : 'transparent';
+    btn.style.borderColor  = isActive ? 'rgba(52,201,122,0.4)'  : 'var(--border2)';
+    btn.style.color        = isActive ? 'var(--irp)'            : 'var(--text2)';
+  });
+  calcGapSim();
+}
+
+function calcGapSim() {
+  const monthly   = getRawNumber(document.getElementById('gap-monthly')) || 50;
+  const rateEl    = document.getElementById('gap-rate');
+  const inflEl    = document.getElementById('gap-inflation');
+  const rate      = rateEl    ? parseFloat(rateEl.value) / 100    : 0.08;
+  const inflation = inflEl    ? parseFloat(inflEl.value) / 100    : 0.03;
+  const years     = _gapYears || 25;
+
+  const rlbl = document.getElementById('gap-rate-label');
+  const ilbl = document.getElementById('gap-inflation-label');
+  if (rlbl) rlbl.textContent = (rate * 100).toFixed(1) + '%';
+  if (ilbl) ilbl.textContent = (inflation * 100).toFixed(1) + '%';
+
+  // A: 매월 투자, 복리 적용
+  const monthlyRate = rate / 12;
+  const n = years * 12;
+  const aVal = monthly * ((Math.pow(1 + monthlyRate, n) - 1) / monthlyRate) * (1 + monthlyRate);
+
+  // B: 같은 돈을 그냥 현금으로 쥐고 있음 → 인플레이션으로 실질 가치 하락
+  const totalCash = monthly * n;
+  const bVal = totalCash / Math.pow(1 + inflation, years); // 실질 가치
+
+  const diff = aVal - bVal;
+  const fmt = n => Math.round(n).toLocaleString('ko-KR') + '만원';
+
+  const set = (id, v, color) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = v;
+    if (color) el.style.color = color;
+  };
+
+  set('gap-a-val', fmt(Math.round(aVal)), 'var(--irp)');
+  set('gap-a-sub', `원금 ${fmt(totalCash)} → 복리 수익 포함`);
+  set('gap-b-val', fmt(Math.round(bVal)), '#e85555');
+  set('gap-b-sub', `${fmt(totalCash)} 썼지만 실질가치 ${fmt(Math.round(bVal))}`);
+  set('gap-diff-val', fmt(Math.round(diff)), '#ffb432');
+  set('gap-diff-sub', `A가 B보다 ${Math.round(diff/bVal*100)}% 더 많음`);
+
+  // 메시지
+  const msgEl = document.getElementById('gap-message');
+  if (msgEl) {
+    msgEl.innerHTML = `💬 월 <strong style="color:var(--irp)">${monthly.toLocaleString()}만원</strong>을 ${years}년간 투자한 A는 <strong style="color:var(--irp)">${fmt(Math.round(aVal))}</strong>을 갖게 되지만, ` +
+      `같은 돈을 그냥 쓴 B의 현금 실질가치는 인플레이션으로 <strong style="color:#e85555">${fmt(Math.round(bVal))}</strong>에 불과합니다. ` +
+      `<strong style="color:#ffb432">${fmt(Math.round(diff))} 차이</strong> — 이것이 준비한 자와 그렇지 않은 자 사이의 노후 양극화입니다.`;
+  }
+
+  // 차트
+  const ctx = document.getElementById('chart-gap-sim');
+  if (!ctx) return;
+
+  const yearLabels = [];
+  const aData = [], bData = [];
+  for (let y = 0; y <= years; y += (years <= 10 ? 1 : years <= 25 ? 5 : 5)) {
+    yearLabels.push(y + '년');
+    const ny = y * 12;
+    aData.push(Math.round(monthly * ((Math.pow(1 + monthlyRate, ny) - 1) / monthlyRate) * (1 + monthlyRate)));
+    bData.push(Math.round((monthly * ny) / Math.pow(1 + inflation, y)));
+  }
+
+  if (_gapChartObj) { _gapChartObj.destroy(); _gapChartObj = null; }
+  _gapChartObj = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: yearLabels,
+      datasets: [
+        {
+          label: 'A (투자한 사람)',
+          data: aData,
+          borderColor: '#34c97a',
+          backgroundColor: 'rgba(52,201,122,0.1)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointBackgroundColor: '#34c97a',
+        },
+        {
+          label: 'B (그냥 쓴 사람)',
+          data: bData,
+          borderColor: '#e85555',
+          backgroundColor: 'rgba(232,85,85,0.05)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointBackgroundColor: '#e85555',
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#8892a4', font: { size: 11 } } },
+        tooltip: { callbacks: {
+          label: ctx => ctx.dataset.label + ': ' + ctx.raw.toLocaleString() + '만원'
+        }}
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8892a4', font: { size: 10 } } },
+        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8892a4', font: { size: 10 },
+          callback: v => v >= 10000 ? (v/10000).toFixed(0) + '억' : v.toLocaleString() + '만'
+        }}
+      }
+    }
+  });
+}
+
+/* ════════════════════════════════════════
+   글로벌 연금 — 401(k) 시뮬레이터
+════════════════════════════════════════ */
+var _401kYears = 20;
+var _matchRate = 0.03;
+
+function setMatch(rate) {
+  _matchRate = rate;
+  document.querySelectorAll('[data-match]').forEach(btn => {
+    const isActive = parseFloat(btn.dataset.match) === rate;
+    btn.style.background   = isActive ? 'rgba(255,180,50,0.12)' : 'transparent';
+    btn.style.borderColor  = isActive ? 'rgba(255,180,50,0.4)'  : 'var(--border2)';
+    btn.style.color        = isActive ? '#ffb432'               : 'var(--text2)';
+  });
+  calc401k();
+}
+
+function set401kYears(yr) {
+  _401kYears = yr;
+  document.querySelectorAll('[data-yr401]').forEach(btn => {
+    const isActive = parseInt(btn.dataset.yr401) === yr;
+    btn.style.background  = isActive ? 'rgba(52,201,122,0.12)' : 'transparent';
+    btn.style.borderColor = isActive ? 'rgba(52,201,122,0.4)'  : 'var(--border2)';
+    btn.style.color       = isActive ? 'var(--irp)'            : 'var(--text2)';
+  });
+  calc401k();
+}
+
+function calc401k() {
+  const monthly = getRawNumber(document.getElementById('g401-monthly')) || 500;
+  const rateEl  = document.getElementById('g401-rate');
+  const rate    = rateEl ? parseFloat(rateEl.value) / 100 : 0.08;
+  const years   = _401kYears || 20;
+  const match   = _matchRate || 0;
+
+  const lbl = document.getElementById('g401-rate-label');
+  if (lbl) lbl.textContent = (rate * 100).toFixed(1) + '%';
+
+  // 기본 월급 가정 ($5,000) 기준 매칭
+  const assumedSalary = 5000;
+  const matchMonthly  = assumedSalary * match;
+  const totalMonthly  = monthly + matchMonthly;
+
+  const mr = rate / 12;
+  const n  = years * 12;
+  const fv = v => v * ((Math.pow(1 + mr, n) - 1) / mr) * (1 + mr);
+
+  const myTotal    = monthly * n;
+  const matchTotal = matchMonthly * n;
+  const totalFV    = fv(totalMonthly);
+  const profit     = totalFV - myTotal - matchTotal;
+
+  // 4% 룰 월 인출
+  const monthlyDiv = totalFV * 0.04 / 12;
+  // 소셜 시큐리티 평균 ($1,976/월 기준)
+  const withSS = monthlyDiv + 1976;
+
+  // 원화 환산 (1달러=1,400원)
+  const KRW = 1400;
+  const fmt$ = n => '$' + Math.round(n).toLocaleString();
+  const fmtW = n => Math.round(n * KRW / 10000).toLocaleString() + '만원';
+
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  set('g401-my-total',     fmt$(myTotal) + ' (' + fmtW(myTotal) + ')');
+  set('g401-match-total',  fmt$(matchTotal) + ' (' + fmtW(matchTotal) + ')');
+  set('g401-profit',       fmt$(Math.round(profit)) + ' (' + fmtW(profit) + ')');
+  set('g401-total',        fmt$(Math.round(totalFV)) + ' (' + fmtW(totalFV) + ')');
+  set('g401-monthly-div',  fmt$(Math.round(monthlyDiv)) + '/월 (' + fmtW(monthlyDiv) + ')');
+  set('g401-with-ss',      fmt$(Math.round(withSS)) + '/월 (' + fmtW(withSS) + ')');
+
+  // 코멘트
+  const commentEl = document.getElementById('g401-comment');
+  if (commentEl) {
+    const canSEA = monthlyDiv >= 700; // $700 이상이면 동남아 가능
+    const seaMsg = canSEA
+      ? `🏖️ <strong style="color:var(--irp)">동남아 장기 생활 가능!</strong> 월 배당 ${fmt$(Math.round(monthlyDiv))}(${fmtW(monthlyDiv)})으로 태국·베트남 생활비 충분히 커버됩니다.`
+      : `📈 아직 동남아 생활엔 조금 부족해요. 납입액을 늘리거나 기간을 늘리면 가능해집니다.`;
+    commentEl.innerHTML = `💬 ${years}년 후 총 자산 <strong style="color:#ffb432">${fmt$(Math.round(totalFV))}(${fmtW(totalFV)})</strong> 형성. 4% 룰 적용 시 월 <strong style="color:var(--irp)">${fmt$(Math.round(monthlyDiv))}</strong> 배당 수령 가능. 소셜 시큐리티 포함하면 월 <strong style="color:var(--isa)">${fmt$(Math.round(withSS))}</strong>.<br>${seaMsg}`;
+  }
 }
 </script>
 </body>
