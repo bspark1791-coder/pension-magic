@@ -4861,7 +4861,7 @@ const JJAJANG_DATA = [
    공통 유틸
 ═══════════════════════════════════════ */
 const $ = id => document.getElementById(id);
-const sync = (id, v) => $(id).textContent = v;
+const sync = (id, v) => { const el = $(id); if (el) el.textContent = v; };
 
 /* ── 숫자 포맷 ── */
 function fmt(won) {
@@ -6526,6 +6526,7 @@ function setRisk(risk) {
 }
 
 function calcIRPAlloc() {
+  if (!$('irp-total-input')) return;
   const total    = (+$('irp-total-input').value || 1000) * 1e4;
   const safeMin  = total * 0.3;
   const riskyMax = total * 0.7;
@@ -8485,6 +8486,7 @@ function setChildAge(age) {
 }
 
 function calcChildPlan() {
+  if (!document.getElementById('child-gift1')) return;
   const gift1 = getRawNumber(document.getElementById('child-gift1')) || 2000;
   const gift2 = getRawNumber(document.getElementById('child-gift2')) || 2000;
   const rateEl = document.getElementById('child-rate');
@@ -8654,6 +8656,7 @@ function initInequalityCharts() {
 
 /* ── 내 위치 계산기 ── */
 function calcMyPosition() {
+  if (!document.getElementById('ineq-income')) return;
   const income = getRawNumber(document.getElementById('ineq-income')) || 350;
   const asset  = getRawNumber(document.getElementById('ineq-asset'))  || 15000;
   const age    = parseInt(document.getElementById('ineq-age')?.value)       || 35;
@@ -9034,6 +9037,7 @@ function setPension(val) {
 }
 
 function calcMyRank() {
+  if (!document.getElementById('rank-saving')) return;
   const saving = getRawNumber(document.getElementById('rank-saving')) || 50;
   const asset  = getRawNumber(document.getElementById('rank-asset'))  || 30000;
   const age    = parseInt(document.getElementById('rank-age')?.value) || 35;
@@ -9152,6 +9156,7 @@ function setGapYears(yr) {
 }
 
 function calcGapSim() {
+  if (!document.getElementById('gap-monthly')) return;
   const monthly   = getRawNumber(document.getElementById('gap-monthly')) || 50;
   const rateEl    = document.getElementById('gap-rate');
   const inflEl    = document.getElementById('gap-inflation');
@@ -9287,6 +9292,8 @@ function set401kYears(yr) {
 }
 
 function calc401k() {
+  // 패널이 아직 DOM에 없으면 실행 안 함
+  if (!document.getElementById('g401-monthly')) return;
   const monthly = getRawNumber(document.getElementById('g401-monthly')) || 500;
   const rateEl  = document.getElementById('g401-rate');
   const rate    = rateEl ? parseFloat(rateEl.value) / 100 : 0.08;
