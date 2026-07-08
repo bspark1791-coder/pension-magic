@@ -3418,6 +3418,21 @@ Coca-Cola	=GOOGLEFINANCE("NYSE:KO","price")	=GOOGLEFINANCE("NYSE:KO","changepct"
       </p>
     </div>
 
+
+    <!-- 서브탭 버튼 -->
+    <div style="display:flex;gap:10px;margin-bottom:24px;border-bottom:1px solid var(--border);padding-bottom:0">
+      <button onclick="setChildTab('korea')" id="child-tab-korea"
+        style="padding:10px 20px;font-size:13px;font-weight:600;border:none;background:none;cursor:pointer;color:var(--irp);border-bottom:2px solid var(--irp);margin-bottom:-1px;font-family:var(--sans);transition:all 0.2s">
+        👶 한국 증여 가이드
+      </button>
+      <button onclick="setChildTab('trump')" id="child-tab-trump"
+        style="padding:10px 20px;font-size:13px;font-weight:600;border:none;background:none;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;font-family:var(--sans);transition:all 0.2s">
+        🇺🇸 미국 트럼프 계좌
+      </button>
+    </div>
+
+    <!-- 한국 증여 콘텐츠 -->
+    <div id="child-content-korea">
     <!-- 증여 한도 요약 카드 -->
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:32px">
       <div style="background:var(--bg2);border:1px solid rgba(255,180,50,0.3);border-radius:14px;padding:18px;text-align:center">
@@ -3651,8 +3666,10 @@ Coca-Cola	=GOOGLEFINANCE("NYSE:KO","price")	=GOOGLEFINANCE("NYSE:KO","changepct"
 
       </div>
     </div>
+    </div>
 
-
+    <!-- 트럼프 계좌 콘텐츠 -->
+    <div id="child-content-trump" style="display:none">
     <!-- 트럼프 계좌 섹션 -->
     <div style="background:var(--bg2);border:1px solid rgba(61,142,240,0.3);border-radius:16px;padding:24px;margin-bottom:28px">
 
@@ -3789,6 +3806,7 @@ Coca-Cola	=GOOGLEFINANCE("NYSE:KO","price")	=GOOGLEFINANCE("NYSE:KO","changepct"
         💡 <strong style="color:var(--isa)">트럼프 계좌의 진짜 목적</strong> — 수백만 명 아이들의 돈이 미국 증시로 유입되면서 <strong style="color:var(--isa)">미국 자본시장이 강해지는 구조</strong>예요. 아이는 복리로 자산을 쌓고, 미국은 장기 투자자를 확보하는 윈윈이에요.<br>
         🇰🇷 <strong style="color:var(--irp)">한국 부모라면</strong> — 트럼프 계좌 직접 가입은 불가하지만, <strong style="color:var(--irp)">자녀 명의 증권계좌 + S&P500 ETF</strong>로 똑같은 효과를 만들 수 있어요.
       </div>
+    </div>
     </div>
 
     <!-- 유의사항 -->
@@ -5093,7 +5111,7 @@ function showPage(name) {
   if (name === 'insight')   { renderSalaryGrid(); renderJjajangChart(); }
   if (name === 'planner')   { /* 계산기는 이미 초기화됨 */ }
   if (name === 'goalcalc')  { calcGoal(); }
-  if (name === 'childplan') { calcChildPlan(); calcTrumpAccount(); initCommaInputs(); }
+  if (name === 'childplan') { setChildTab('korea'); initCommaInputs(); }
   if (name === 'inequality') { initInequalityCharts(); calcMyPosition(); calcMyRank(); calcGapSim(); initCommaInputs(); }
   if (name === 'etfrec')    { renderMacroRec(); }
 }
@@ -9533,6 +9551,33 @@ function calcTrumpAccount() {
   set('trump-parent-val', fmt$(Math.round(parentVal)));
   set('trump-total-usd',  fmt$(Math.round(totalUSD)));
   set('trump-total-krw',  fmtW(totalKRW));
+}
+
+/* ════════════════════════════════════════
+   자녀투자 페이지 탭 전환
+════════════════════════════════════════ */
+function setChildTab(tab) {
+  // 콘텐츠 전환
+  const korea = document.getElementById('child-content-korea');
+  const trump = document.getElementById('child-content-trump');
+  if (korea) korea.style.display = tab === 'korea' ? '' : 'none';
+  if (trump) trump.style.display = tab === 'trump' ? '' : 'none';
+
+  // 탭 버튼 스타일
+  const btnKorea = document.getElementById('child-tab-korea');
+  const btnTrump = document.getElementById('child-tab-trump');
+  if (btnKorea) {
+    btnKorea.style.color       = tab === 'korea' ? 'var(--irp)'   : 'var(--text3)';
+    btnKorea.style.borderColor = tab === 'korea' ? 'var(--irp)'   : 'transparent';
+  }
+  if (btnTrump) {
+    btnTrump.style.color       = tab === 'trump' ? 'var(--isa)'   : 'var(--text3)';
+    btnTrump.style.borderColor = tab === 'trump' ? 'var(--isa)'   : 'transparent';
+  }
+
+  // 탭별 초기화
+  if (tab === 'korea') { calcChildPlan(); }
+  if (tab === 'trump') { calcTrumpAccount(); initCommaInputs(); }
 }
 </script>
 </body>
