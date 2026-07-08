@@ -2995,6 +2995,9 @@ Coca-Cola	=GOOGLEFINANCE("NYSE:KO","price")	=GOOGLEFINANCE("NYSE:KO","changepct"
     <button onclick="addNews()" style="padding:9px 20px;background:rgba(232,85,85,0.15);border:1px solid rgba(232,85,85,0.3);border-radius:8px;color:var(--red);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans)">+ 뉴스 추가</button>
   </div>
 </div>
+
+<footer><p>뉴스는 직접 추가·관리합니다. 링크 클릭 시 해당 언론사 페이지로 이동합니다.</p></footer>
+  </div>
 <div id="insight-global" class="msub-panel" style="display:none">
   <div style="max-width:900px;margin:0 auto;padding:16px 0">
 
@@ -3204,9 +3207,6 @@ Coca-Cola	=GOOGLEFINANCE("NYSE:KO","price")	=GOOGLEFINANCE("NYSE:KO","changepct"
     </div>
   </div>
 </div>
-
-<footer><p>뉴스는 직접 추가·관리합니다. 링크 클릭 시 해당 언론사 페이지로 이동합니다.</p></footer>
-  </div>
 </div><!-- /page-insight -->
 
 <!-- ══════════════ 노후설계 페이지 ══════════════ -->
@@ -3649,6 +3649,145 @@ Coca-Cola	=GOOGLEFINANCE("NYSE:KO","price")	=GOOGLEFINANCE("NYSE:KO","changepct"
           </div>
         </div>
 
+      </div>
+    </div>
+
+
+    <!-- 트럼프 계좌 섹션 -->
+    <div style="background:var(--bg2);border:1px solid rgba(61,142,240,0.3);border-radius:16px;padding:24px;margin-bottom:28px">
+
+      <!-- 헤더 -->
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+        <div style="font-size:32px">🇺🇸</div>
+        <div>
+          <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(61,142,240,0.1);border:1px solid rgba(61,142,240,0.3);border-radius:20px;padding:4px 14px;font-size:11px;color:var(--isa);letter-spacing:0.08em;margin-bottom:6px">
+            TRUMP ACCOUNTS — 2026.07.04 출범
+          </div>
+          <h3 style="font-size:15px;font-weight:700;color:var(--text);margin:0">미국은 어떻게 하나? — 트럼프 계좌</h3>
+          <p style="font-size:12px;color:var(--text3);margin:4px 0 0">미국 정부가 신생아에게 1,000달러 종잣돈을 넣어주는 투자 계좌</p>
+        </div>
+      </div>
+
+      <!-- 핵심 스펙 카드 -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:20px">
+        <div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px">정부 지원 종잣돈</div>
+          <div style="font-size:22px;font-weight:800;color:var(--isa);font-family:var(--mono)">$1,000</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px">약 140만원 (무상 지급)</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px">부모 추가 납입 한도</div>
+          <div style="font-size:22px;font-weight:800;color:var(--irp);font-family:var(--mono)">$5,000</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px">연간 비과세 납입</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px">대상 신생아</div>
+          <div style="font-size:22px;font-weight:800;color:#ffb432;font-family:var(--mono)">140만명</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px">2025~2028년 출생</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px">인출 최적 시점</div>
+          <div style="font-size:22px;font-weight:800;color:var(--isa);font-family:var(--mono)">30세~</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px">세금·패널티 없음</div>
+        </div>
+      </div>
+
+      <!-- 복리 시뮬레이터 -->
+      <div style="background:var(--bg3);border-radius:12px;padding:18px;margin-bottom:16px">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px">📊 트럼프 계좌 복리 시뮬레이터</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">
+          <div>
+            <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:6px">부모 연간 추가 납입 ($)</label>
+            <input type="text" id="trump-annual" value="5,000" inputmode="numeric" class="comma-input" data-calc="calcTrumpAccount"
+              style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:15px;color:var(--text);font-family:var(--mono);box-sizing:border-box">
+            <div style="font-size:10px;color:var(--text3);margin-top:3px">최대 $5,000/년 비과세</div>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:6px">연 수익률 — <span id="trump-rate-label" style="color:var(--isa);font-weight:700">8%</span></label>
+            <input type="range" id="trump-rate" min="4" max="12" step="0.5" value="8" oninput="calcTrumpAccount()"
+              style="width:100%;accent-color:var(--isa)">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3)">
+              <span>4%</span><span style="color:var(--isa)">S&P500 역대 ~10%</span><span>12%</span>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:6px">확인 시점</label>
+            <div style="display:flex;gap:6px">
+              <button onclick="setTrumpAge(18)" data-trump-age="18" style="flex:1;padding:8px;border-radius:7px;font-size:11px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--sans)">18세</button>
+              <button onclick="setTrumpAge(30)" data-trump-age="30" style="flex:1;padding:8px;border-radius:7px;font-size:11px;border:1px solid rgba(61,142,240,0.4);background:rgba(61,142,240,0.12);color:var(--isa);cursor:pointer;font-family:var(--sans)">30세</button>
+              <button onclick="setTrumpAge(65)" data-trump-age="65" style="flex:1;padding:8px;border-radius:7px;font-size:11px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--sans)">65세</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 결과 -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+          <div style="background:var(--bg2);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px">정부 종잣돈 복리</div>
+            <div style="font-size:16px;font-weight:700;color:var(--isa);font-family:var(--mono)" id="trump-seed-val">—</div>
+          </div>
+          <div style="background:var(--bg2);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px">부모 납입 복리</div>
+            <div style="font-size:16px;font-weight:700;color:var(--irp);font-family:var(--mono)" id="trump-parent-val">—</div>
+          </div>
+          <div style="background:linear-gradient(135deg,rgba(61,142,240,0.12),rgba(52,201,122,0.12));border:1px solid rgba(61,142,240,0.3);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:11px;color:var(--isa);margin-bottom:4px">총 자산 (달러)</div>
+            <div style="font-size:18px;font-weight:800;color:var(--isa);font-family:var(--mono)" id="trump-total-usd">—</div>
+          </div>
+          <div style="background:var(--bg2);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px">총 자산 (원화 환산)</div>
+            <div style="font-size:16px;font-weight:700;color:#ffb432;font-family:var(--mono)" id="trump-total-krw">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 한국 vs 미국 비교 -->
+      <div style="background:var(--bg3);border-radius:12px;padding:16px;margin-bottom:16px">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px">🇰🇷 한국 증여 vs 🇺🇸 미국 트럼프 계좌 비교</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <thead>
+              <tr style="background:var(--bg2)">
+                <th style="padding:10px 12px;text-align:left;color:var(--text3);border-bottom:1px solid var(--border)">구분</th>
+                <th style="padding:10px 12px;text-align:center;color:var(--irp);border-bottom:1px solid var(--border)">🇰🇷 한국 증여</th>
+                <th style="padding:10px 12px;text-align:center;color:var(--isa);border-bottom:1px solid var(--border)">🇺🇸 트럼프 계좌</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid var(--border)">
+                <td style="padding:10px 12px;color:var(--text3)">정부 지원</td>
+                <td style="padding:10px 12px;text-align:center;color:var(--text3)">❌ 없음</td>
+                <td style="padding:10px 12px;text-align:center;color:var(--isa);font-weight:600">✅ $1,000 무상</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border);background:rgba(255,255,255,0.02)">
+                <td style="padding:10px 12px;color:var(--text3)">비과세 한도</td>
+                <td style="padding:10px 12px;text-align:center;color:var(--irp);font-weight:600">2,000만원/10년</td>
+                <td style="padding:10px 12px;text-align:center;color:var(--isa);font-weight:600">$5,000/년 비과세</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border)">
+                <td style="padding:10px 12px;color:var(--text3)">투자 방식</td>
+                <td style="padding:10px 12px;text-align:center;color:var(--text2)">부모가 직접 ETF 매수</td>
+                <td style="padding:10px 12px;text-align:center;color:var(--text2)">정부 운용 + 미국 증시</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border);background:rgba(255,255,255,0.02)">
+                <td style="padding:10px 12px;color:var(--text3)">인출 조건</td>
+                <td style="padding:10px 12px;text-align:center;color:var(--text2)">자유롭게 가능</td>
+                <td style="padding:10px 12px;text-align:center;color:var(--text2)">30세 이후 자유</td>
+              </tr>
+              <tr>
+                <td style="padding:10px 12px;color:var(--text3);font-weight:600">화폐</td>
+                <td style="padding:10px 12px;text-align:center;color:var(--irp);font-weight:600">🇰🇷 원화</td>
+                <td style="padding:10px 12px;text-align:center;color:var(--isa);font-weight:600">💵 달러 (환율 레버리지)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 핵심 인사이트 -->
+      <div style="padding:14px 16px;background:rgba(61,142,240,0.05);border:1px solid rgba(61,142,240,0.2);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.9">
+        💡 <strong style="color:var(--isa)">트럼프 계좌의 진짜 목적</strong> — 수백만 명 아이들의 돈이 미국 증시로 유입되면서 <strong style="color:var(--isa)">미국 자본시장이 강해지는 구조</strong>예요. 아이는 복리로 자산을 쌓고, 미국은 장기 투자자를 확보하는 윈윈이에요.<br>
+        🇰🇷 <strong style="color:var(--irp)">한국 부모라면</strong> — 트럼프 계좌 직접 가입은 불가하지만, <strong style="color:var(--irp)">자녀 명의 증권계좌 + S&P500 ETF</strong>로 똑같은 효과를 만들 수 있어요.
       </div>
     </div>
 
@@ -4954,7 +5093,7 @@ function showPage(name) {
   if (name === 'insight')   { renderSalaryGrid(); renderJjajangChart(); }
   if (name === 'planner')   { /* 계산기는 이미 초기화됨 */ }
   if (name === 'goalcalc')  { calcGoal(); }
-  if (name === 'childplan') { calcChildPlan(); }
+  if (name === 'childplan') { calcChildPlan(); calcTrumpAccount(); initCommaInputs(); }
   if (name === 'inequality') { initInequalityCharts(); calcMyPosition(); calcMyRank(); calcGapSim(); initCommaInputs(); }
   if (name === 'etfrec')    { renderMacroRec(); }
 }
@@ -9344,6 +9483,56 @@ function calc401k() {
       : `📈 아직 동남아 생활엔 조금 부족해요. 납입액을 늘리거나 기간을 늘리면 가능해집니다.`;
     commentEl.innerHTML = `💬 ${years}년 후 총 자산 <strong style="color:#ffb432">${fmt$(Math.round(totalFV))}(${fmtW(totalFV)})</strong> 형성. 4% 룰 적용 시 월 <strong style="color:var(--irp)">${fmt$(Math.round(monthlyDiv))}</strong> 배당 수령 가능. 소셜 시큐리티 포함하면 월 <strong style="color:var(--isa)">${fmt$(Math.round(withSS))}</strong>.<br>${seaMsg}`;
   }
+}
+
+/* ════════════════════════════════════════
+   트럼프 계좌 시뮬레이터
+════════════════════════════════════════ */
+var _trumpAge = 30;
+
+function setTrumpAge(age) {
+  _trumpAge = age;
+  document.querySelectorAll('[data-trump-age]').forEach(btn => {
+    const isActive = parseInt(btn.dataset.trumpAge) === age;
+    btn.style.background   = isActive ? 'rgba(61,142,240,0.12)' : 'transparent';
+    btn.style.borderColor  = isActive ? 'rgba(61,142,240,0.4)'  : 'var(--border2)';
+    btn.style.color        = isActive ? 'var(--isa)'            : 'var(--text2)';
+  });
+  calcTrumpAccount();
+}
+
+function calcTrumpAccount() {
+  if (!document.getElementById('trump-annual')) return;
+  const annual  = getRawNumber(document.getElementById('trump-annual')) || 5000;
+  const rateEl  = document.getElementById('trump-rate');
+  const rate    = rateEl ? parseFloat(rateEl.value) / 100 : 0.08;
+  const age     = _trumpAge || 30;
+  const KRW     = 1400; // 환율 기준
+
+  const lbl = document.getElementById('trump-rate-label');
+  if (lbl) lbl.textContent = (rate * 100).toFixed(1) + '%';
+
+  // 정부 종잣돈 $1,000 복리
+  const seedVal = 1000 * Math.pow(1 + rate, age);
+
+  // 부모 연간 납입 복리 (연복리)
+  const parentVal = annual * ((Math.pow(1 + rate, age) - 1) / rate) * (1 + rate);
+
+  const totalUSD = seedVal + parentVal;
+  const totalKRW = totalUSD * KRW;
+
+  const fmt$ = n => '$' + Math.round(n).toLocaleString();
+  const fmtW = n => {
+    const man = Math.round(n / 10000);
+    if (man >= 10000) return (man / 10000).toFixed(1) + '억원';
+    return man.toLocaleString() + '만원';
+  };
+
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  set('trump-seed-val',   fmt$(Math.round(seedVal)));
+  set('trump-parent-val', fmt$(Math.round(parentVal)));
+  set('trump-total-usd',  fmt$(Math.round(totalUSD)));
+  set('trump-total-krw',  fmtW(totalKRW));
 }
 </script>
 </body>
